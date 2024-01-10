@@ -7,6 +7,7 @@ import 'package:social_app/components/comment_tile.dart';
 import 'package:social_app/components/like.dart';
 import 'package:social_app/database/firestore.dart';
 import 'package:social_app/components/comment.dart';
+import 'package:social_app/helper/hashtag.dart';
 import 'package:social_app/models/comments_model.dart';
 import 'package:social_app/models/posts_model.dart';
 
@@ -91,11 +92,11 @@ class PostOpenPageState extends State<PostOpenPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.postModel.postmessage.toString(),
-                      style: const TextStyle(
-                        fontSize: 20,
-                      ),
+                    HashtagView(
+                      text: widget.postModel.postmessage.toString(),
+                      maxLines: null,
+                      textOverflow: TextOverflow.visible,
+                      textSize: 20,
                     ),
                     const SizedBox(
                       height: 8,

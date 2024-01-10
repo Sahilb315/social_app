@@ -3,6 +3,7 @@ import 'package:social_app/components/bookmark.dart';
 import 'package:social_app/components/comment.dart';
 import 'package:social_app/components/like.dart';
 import 'package:social_app/database/firestore.dart';
+import 'package:social_app/helper/hashtag.dart';
 import 'package:social_app/helper/timeago_messages.dart';
 import 'package:social_app/models/posts_model.dart';
 import 'package:social_app/pages/post_open_page.dart';
@@ -68,7 +69,8 @@ class _MyListTileState extends State<MyListTile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const CircleAvatar(
-                    foregroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvi7HpQ-_PMSMOFrj1hwjp6LDcI-jm3Ro0Xw&usqp=CAU"),
+                    foregroundImage: NetworkImage(
+                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvi7HpQ-_PMSMOFrj1hwjp6LDcI-jm3Ro0Xw&usqp=CAU"),
                   ),
                   const SizedBox(
                     width: 10,
@@ -81,16 +83,18 @@ class _MyListTileState extends State<MyListTile> {
                         Row(
                           children: [
                             Text(widget.postModel.username.toString()),
+                            //  text(),
+                            //* If want to display the users email ↓
+                            // Text(
+                            //   "  ${widget.postModel.useremail.toString()}",
+                            //   style: TextStyle(
+                            //     color: Theme.of(context)
+                            //         .colorScheme
+                            //         .inversePrimary,
+                            //   ),
+                            // ),
                             Text(
-                              "  ${widget.postModel.useremail.toString()}",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
-                              ),
-                            ),
-                            Text(
-                              " @${timeago.format(widget.postModel.timestamp!.toDate(), locale: 'en_short')}",
+                              " ${timeago.format(widget.postModel.timestamp!.toDate(), locale: 'en_short')}",
                               style: TextStyle(
                                 color: Theme.of(context)
                                     .colorScheme
@@ -99,13 +103,11 @@ class _MyListTileState extends State<MyListTile> {
                             ),
                           ],
                         ),
-                        Text(
-                          widget.postModel.postmessage.toString(),
+                        HashtagView(
+                          text: widget.postModel.postmessage.toString(),
                           maxLines: 6,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.inversePrimary,
-                          ),
+                          textOverflow: TextOverflow.ellipsis,
+                          textSize: 16,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
