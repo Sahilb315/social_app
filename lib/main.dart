@@ -17,10 +17,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(ChangeNotifierProvider(
-    create: (context) => ThemeProvider(),
-    child: const MyApp(),
-  ));
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -30,8 +32,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: const AuthPage(),
-      // debugShowMaterialGrid: true,
-      // darkTheme: darkMode,
       theme: Provider.of<ThemeProvider>(context).themeData,
       debugShowCheckedModeBanner: false,
       routes: {
@@ -39,11 +39,9 @@ class MyApp extends StatelessWidget {
         MyRoutes.usersPage: (context) => const UsersPage(),
         MyRoutes.profilePage: (context) => ProfilePage(),
         MyRoutes.bookmarkPage: (context) => const BookmarkPage(),
-        MyRoutes.settingsPage :(context) => const SettingsPage(),
-        MyRoutes.loginOrRegisterPage :(context) =>const LoginOrRegister(),
-        // MyRoutes.openPostPage :(context) =>  PostOpenPage(),
-        // '/postPage' :(context) => const PostOpenPage(docID: '', likes: [], username: '', useremail: '', dateTime: ,)
-      },
+        MyRoutes.settingsPage: (context) => const SettingsPage(),
+        MyRoutes.loginOrRegisterPage: (context) => const LoginOrRegister(),
+       },
     );
   }
 }
