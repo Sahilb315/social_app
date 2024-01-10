@@ -3,8 +3,10 @@ import 'package:social_app/components/bookmark.dart';
 import 'package:social_app/components/comment.dart';
 import 'package:social_app/components/like.dart';
 import 'package:social_app/database/firestore.dart';
+import 'package:social_app/helper/timeago_messages.dart';
 import 'package:social_app/models/posts_model.dart';
 import 'package:social_app/pages/post_open_page.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class MyListTile extends StatefulWidget {
   final String docID;
@@ -16,7 +18,8 @@ class MyListTile extends StatefulWidget {
     super.key,
     required this.docID,
     required this.index,
-    required this.postModel, required this.date,
+    required this.postModel,
+    required this.date,
   });
 
   @override
@@ -25,6 +28,11 @@ class MyListTile extends StatefulWidget {
 
 class _MyListTileState extends State<MyListTile> {
   FirestoreDatabase firestoreDatabase = FirestoreDatabase();
+  @override
+  void initState() {
+    timeago.setLocaleMessages('my_en', MyCustomMessages());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +67,9 @@ class _MyListTileState extends State<MyListTile> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const CircleAvatar(),
+                  const CircleAvatar(
+                    foregroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvi7HpQ-_PMSMOFrj1hwjp6LDcI-jm3Ro0Xw&usqp=CAU"),
+                  ),
                   const SizedBox(
                     width: 10,
                   ),
@@ -73,6 +83,14 @@ class _MyListTileState extends State<MyListTile> {
                             Text(widget.postModel.username.toString()),
                             Text(
                               "  ${widget.postModel.useremail.toString()}",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                              ),
+                            ),
+                            Text(
+                              " @${timeago.format(widget.postModel.timestamp!.toDate(), locale: 'en_short')}",
                               style: TextStyle(
                                 color: Theme.of(context)
                                     .colorScheme
@@ -119,4 +137,3 @@ class _MyListTileState extends State<MyListTile> {
     );
   }
 }
-
