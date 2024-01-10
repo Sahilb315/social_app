@@ -7,6 +7,7 @@ import 'package:social_app/components/drawer.dart';
 import 'package:social_app/components/my_list_tile.dart';
 import 'package:social_app/components/my_textfield.dart';
 import 'package:social_app/database/firestore.dart';
+import 'package:social_app/models/posts_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,6 +19,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController postController = TextEditingController();
   FirestoreDatabase firestoreDatabase = FirestoreDatabase();
+  List<PostModel> postList = [];
 
   void postMessage() {
     if (postController.text.isNotEmpty) {
@@ -51,7 +53,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 CustomButton(
-                  onTap: postMessage,
+                  onTap: () => postMessage,
                 ),
               ],
             ),
@@ -80,30 +82,25 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 }
+                postList = posts
+                    .map(
+                      (doc) => PostModel.fromJson(
+                          doc.data() as Map<String, dynamic>),
+                    )
+                    .toList();
                 return ListView.builder(
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
-                    // print(index);
+                    final newPosts = postList[index];
                     final post = posts[index];
                     final docID = post.id;
-                    // int postIndex = index;
-                
-                    String message = post['postmessage'] ?? "";
-                    String userEmail = post['useremail'] ?? "";
-                    Timestamp timestamp = post['timestamp'] ?? "";
-                    List<dynamic> mylikes = post['like'] ?? "";
-                    String username = post['username'] ?? "";
-                    DateTime date = timestamp.toDate();
-                    final formatDate = DateFormat("yyyy-MM-dd").format(date);
-                
+                    final date = newPosts.formatDate(newPosts.timestamp).toString();
+                    
                     return MyListTile(
                       index: index,
-                      username: username,
-                      title: message,
-                      useremail: userEmail,
-                      leadingTime: formatDate.toString(),
+                      date: date,
                       docID: docID,
-                      likes: mylikes,
+                      postModel: newPosts,
                     );
                   },
                 );

@@ -3,30 +3,20 @@ import 'package:social_app/components/bookmark.dart';
 import 'package:social_app/components/comment.dart';
 import 'package:social_app/components/like.dart';
 import 'package:social_app/database/firestore.dart';
+import 'package:social_app/models/posts_model.dart';
 import 'package:social_app/pages/post_open_page.dart';
 
 class MyListTile extends StatefulWidget {
-  final String title;
-  final String useremail;
-  final String leadingTime;
   final String docID;
-  final List<dynamic> likes;
-  // final String docID;
-  final String username;
   final int index;
-  // final String useremail;
+  final PostModel postModel;
+  final String date;
 
   const MyListTile({
     super.key,
-    required this.title,
-    required this.useremail,
-    required this.leadingTime,
     required this.docID,
-    required this.likes,
-    required this.username,
     required this.index,
-    // required this.useremail,
-    // required this.docID,
+    required this.postModel, required this.date,
   });
 
   @override
@@ -40,16 +30,16 @@ class _MyListTileState extends State<MyListTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigator.pushNamed(context, '/postPage',arguments: widget.docID);
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => PostOpenPage(
+              postModel: widget.postModel,
               docID: widget.docID,
-              likes: widget.likes,
-              username: widget.username,
-              dateTime: widget.leadingTime,
-              useremail: widget.useremail,
+              likes: widget.postModel.like!.toList(),
+              username: widget.postModel.username.toString(),
+              dateTime: widget.date,
+              useremail: widget.postModel.useremail.toString(),
             ),
           ),
         );
@@ -80,18 +70,19 @@ class _MyListTileState extends State<MyListTile> {
                       children: [
                         Row(
                           children: [
-                            Text(widget.username),
+                            Text(widget.postModel.username.toString()),
                             Text(
-                              "  ${widget.useremail}",
+                              "  ${widget.postModel.useremail.toString()}",
                               style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inversePrimary),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                              ),
                             ),
                           ],
                         ),
                         Text(
-                          widget.title,
+                          widget.postModel.postmessage.toString(),
                           maxLines: 6,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -109,7 +100,7 @@ class _MyListTileState extends State<MyListTile> {
                             ),
                             LikeButton(
                               postID: widget.docID,
-                              likes: widget.likes,
+                              likes: widget.postModel.like!.toList(),
                             ),
                           ],
                         ),
@@ -129,62 +120,3 @@ class _MyListTileState extends State<MyListTile> {
   }
 }
 
-/**Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        const Divider(
-          thickness: 0.5,
-        ),
-        ListTile(
-          leading: CircleAvatar(),
-          onTap: () {
-            // Navigator.pushNamed(context, '/postPage',arguments: widget.docID);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PostOpenPage(
-                  docID: widget.docID,
-                  likes: widget.likes,
-                  username: widget.username,
-                  dateTime: widget.leadingTime,
-                  useremail: widget.useremail,
-                ),
-              ),
-            );
-          },
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-          ),
-          title: Text(
-            widget.title,
-            maxLines: 6,
-            overflow: TextOverflow.ellipsis,
-          ),
-          subtitle: Text(
-            "${widget.useremail} . ${widget.leadingTime}",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              // Bookmark
-              Bookmark(docID: widget.docID),
-              // Comment
-              const Comment(),
-              // Like
-              LikeButton(
-                postID: widget.docID,
-                likes: widget.likes,
-              ),
-            ],
-          ),
-        ),
-      ],
-    ); */
