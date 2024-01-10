@@ -1,5 +1,3 @@
-// ignore_for_file: sized_box_for_whitespace
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/components/bookmark.dart';
@@ -45,12 +43,13 @@ class PostOpenPageState extends State<PostOpenPage> {
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         foregroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.background,
         title: const Text('Post'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(14.0),
         child: SingleChildScrollView(
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
             child: Column(
               children: [
@@ -165,16 +164,9 @@ class PostOpenPageState extends State<PostOpenPage> {
                             itemCount: commentsDoc.length,
                             itemBuilder: (context, index) {
                               final newComments = commentsList[index];
-                              final comments = commentsDoc[index];
                               return CommentTile(
-                                tweetedUsername:
-                                    widget.postModel.username.toString(),
-                                content: newComments.content.toString(),
-                                useremail:
-                                    newComments.commentedEmail.toString(),
-                                leadingTime: newComments.timestamp.toString(),
-                                username: newComments.commentedBy.toString(),
-                                docID: comments.id,
+                                postModel: widget.postModel,
+                                commentModel: newComments,
                               );
                             },
                           );
@@ -209,14 +201,6 @@ class PostOpenPageState extends State<PostOpenPage> {
             ),
           ),
         ),
-
-        //  else {
-        //   return const Center(
-        //     child: CircularProgressIndicator(
-        //       color: Colors.black,
-        //     ),
-        //   );
-        // }
       ),
     );
   }
