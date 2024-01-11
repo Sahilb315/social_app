@@ -7,6 +7,7 @@ import 'package:social_app/pages/home_page.dart';
 import 'package:social_app/pages/profile_page.dart';
 import 'package:social_app/pages/settings_page.dart';
 import 'package:social_app/pages/users_page.dart';
+import 'package:social_app/provider/bookmark_provider.dart';
 import 'package:social_app/routes/myroutes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:social_app/theme/theme_provider.dart';
@@ -18,8 +19,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => BookmarkProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -41,7 +45,7 @@ class MyApp extends StatelessWidget {
         MyRoutes.bookmarkPage: (context) => const BookmarkPage(),
         MyRoutes.settingsPage: (context) => const SettingsPage(),
         MyRoutes.loginOrRegisterPage: (context) => const LoginOrRegister(),
-       },
+      },
     );
   }
 }

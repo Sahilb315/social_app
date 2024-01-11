@@ -92,7 +92,7 @@ class FirestoreDatabase {
     return posts.doc(docID).delete();
   }
 
-  Stream<QuerySnapshot> showPosts() {
+  Stream<QuerySnapshot> getPostsByUser() {
     final postStream = FirebaseFirestore.instance
         .collection('post')
         .where('useremail', isEqualTo: user!.email)

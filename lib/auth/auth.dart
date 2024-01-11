@@ -4,7 +4,7 @@ import 'package:social_app/auth/login_or_register.dart';
 import 'package:social_app/pages/home_page.dart';
 
 class AuthPage extends StatelessWidget {
-  const AuthPage({Key? key}) : super(key: key);
+  const AuthPage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -17,6 +17,13 @@ class _HomePageState extends State<HomePage> {
   List<PostModel> postList = [];
 
   @override
+  void initState() {
+    // BookmarkProvider provider = Provider.of(context,listen: false);
+    // provider.fetchBookmark();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -75,6 +82,7 @@ class _HomePageState extends State<HomePage> {
                     final docID = post.id;
                     final date =
                         newPosts.formatDate(newPosts.timestamp).toString();
+                        // log(newPosts.bookmark.toString());
 
                     return MyListTile(
                       index: index,

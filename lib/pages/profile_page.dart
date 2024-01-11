@@ -7,7 +7,7 @@ import 'package:social_app/components/list_tile_profile.dart';
 import 'package:social_app/database/firestore.dart';
 
 class ProfilePage extends StatelessWidget {
-  ProfilePage({Key? key}) : super(key: key);
+  ProfilePage({super.key});
   final FirestoreDatabase firestoreDatabase = FirestoreDatabase();
   final User? currentUser = FirebaseAuth.instance.currentUser;
 
@@ -89,7 +89,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   StreamBuilder(
-                    stream: firestoreDatabase.showPosts(),
+                    stream: firestoreDatabase.getPostsByUser(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(

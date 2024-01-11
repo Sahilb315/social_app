@@ -1,27 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:social_app/database/firestore.dart';
+import 'package:social_app/helper/hashtag.dart';
+import 'package:social_app/models/comments_model.dart';
+import 'package:social_app/models/posts_model.dart';
 
 class CommentTile extends StatefulWidget {
-  final String content;
-  final String useremail;
-  final String leadingTime;
-  final String docID;
-  // final String docID;
-  final String username;
-  final String tweetedUsername;
-// final String useremail;
+  final CommentModel commentModel;
+  final PostModel postModel;
 
   const CommentTile({
     super.key,
-    required this.content,
-    required this.useremail,
-    required this.leadingTime,
-    required this.docID,
-    required this.username,
-    
-    required this.tweetedUsername,
-    // required this.useremail,
-    // required this.docID,
+    required this.commentModel,
+    required this.postModel,
   });
 
   @override
@@ -37,11 +27,6 @@ class _CommentTileState extends State<CommentTile> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // widget.index == 0
-        //     ? const Divider(
-        //         thickness: 0.4,
-        //       )
-        //     : const SizedBox.shrink(),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
@@ -58,43 +43,30 @@ class _CommentTileState extends State<CommentTile> {
                   children: [
                     Row(
                       children: [
-                        Text(widget.username),
-                        Text("  ${widget.useremail}")
+                        Text(
+                          widget.commentModel.commentedBy.toString(),
+                        ),
                       ],
                     ),
                     Row(
                       children: [
-                        const Text("Replying to"),
+                        const Text(
+                          "Replying to",
+                        ),
                         Text(
-                          " @${widget.tweetedUsername}",
+                          " @${widget.postModel.username}",
                           style: TextStyle(
                             color: Colors.blue.shade700,
                           ),
                         )
                       ],
                     ),
-                    // Text("Replying to @${widget.tweetedUsername}"),
-                    Text(
-                      widget.content,
-                      maxLines: 6,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                      ),
+                    HashtagView(
+                      text: widget.commentModel.content.toString(),
+                      maxLines: null,
+                      textOverflow: TextOverflow.visible,
+                      textSize: 14,
                     ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.end,
-                    //   children: [
-                    //     Bookmark(docID: widget.docID),
-                    //     Comment(
-                    //       docID: widget.docID,
-                    //     ),
-                    //     LikeButton(
-                    //       postID: widget.docID,
-                    //       likes: widget.likes,
-                    //     ),
-                    //   ],
-                    // ),
                   ],
                 ),
               ),

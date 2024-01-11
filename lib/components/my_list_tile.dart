@@ -1,5 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:social_app/components/bookmark.dart';
+import 'package:provider/provider.dart';
 import 'package:social_app/components/comment.dart';
 import 'package:social_app/components/like.dart';
 import 'package:social_app/database/firestore.dart';
@@ -7,6 +9,7 @@ import 'package:social_app/helper/hashtag.dart';
 import 'package:social_app/helper/timeago_messages.dart';
 import 'package:social_app/models/posts_model.dart';
 import 'package:social_app/pages/post_open_page.dart';
+import 'package:social_app/provider/bookmark_provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class MyListTile extends StatefulWidget {
@@ -29,6 +32,7 @@ class MyListTile extends StatefulWidget {
 
 class _MyListTileState extends State<MyListTile> {
   FirestoreDatabase firestoreDatabase = FirestoreDatabase();
+  bool isBookmarked = true;
   @override
   void initState() {
     timeago.setLocaleMessages('my_en', MyCustomMessages());
@@ -45,10 +49,6 @@ class _MyListTileState extends State<MyListTile> {
             builder: (context) => PostOpenPage(
               postModel: widget.postModel,
               docID: widget.docID,
-              likes: widget.postModel.like!.toList(),
-              username: widget.postModel.username.toString(),
-              dateTime: widget.date,
-              useremail: widget.postModel.useremail.toString(),
             ),
           ),
         );
@@ -83,7 +83,6 @@ class _MyListTileState extends State<MyListTile> {
                         Row(
                           children: [
                             Text(widget.postModel.username.toString()),
-                            //  text(),
                             //* If want to display the users email ↓
                             // Text(
                             //   "  ${widget.postModel.useremail.toString()}",
@@ -109,20 +108,35 @@ class _MyListTileState extends State<MyListTile> {
                           textOverflow: TextOverflow.ellipsis,
                           textSize: 16,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Bookmark(
-                              docID: widget.docID,
-                            ),
-                            Comment(
-                              docID: widget.docID,
-                            ),
-                            LikeButton(
-                              postID: widget.docID,
-                              likes: widget.postModel.like!.toList(),
-                            ),
-                          ],
+                        Consumer<BookmarkProvider>(
+                          builder: (context, provider, child) => Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    widget.postModel.bookmark =
+                                        !widget.postModel.bookmark;
+                                  });
+                                  // provider.posts[widget.index].bookmark;
+                                  // log(provider.posts[widget.index].bookmark.toString());
+                                  // provider.setBookmark(!provider.bookmark);
+                                  firestoreDatabase.updatePostData(
+                                      widget.docID, widget.postModel.bookmark);
+                                },
+                                icon: widget.postModel.bookmark
+                                    ? const Icon(Icons.bookmark)
+                                    : const Icon(Icons.bookmark_add_outlined),
+                              ),
+                              Comment(
+                                docID: widget.docID,
+                              ),
+                              LikeButton(
+                                postID: widget.docID,
+                                likes: widget.postModel.like!.toList(),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
