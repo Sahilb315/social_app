@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social_app/components/bookmark.dart';
 import 'package:social_app/components/comment_tile.dart';
 import 'package:social_app/components/like.dart';
 import 'package:social_app/database/firestore.dart';
@@ -11,19 +11,11 @@ import 'package:social_app/models/posts_model.dart';
 
 class PostOpenPage extends StatefulWidget {
   final String docID;
-  final List<dynamic> likes;
-  final String username;
-  final String useremail;
-  final String dateTime;
   final PostModel postModel;
 
   const PostOpenPage({
     super.key,
     required this.docID,
-    required this.likes,
-    required this.username,
-    required this.useremail,
-    required this.dateTime,
     required this.postModel,
   });
 
@@ -105,7 +97,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.dateTime,
+                          widget.postModel.timestamp.toString(),
                           style: const TextStyle(fontSize: 14),
                         ),
                       ],
@@ -118,10 +110,42 @@ class PostOpenPageState extends State<PostOpenPage> {
                     ),
                     Row(
                       children: [
-                        Bookmark(
-                          docID: widget.docID,
+                        FutureBuilder(
+                          future: FirebaseFirestore.instance
+                              .collection("post")
+                              .doc(widget.docID)
+                              .get(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final data =
+                                  snapshot.data!.data() as Map<String, dynamic>;
+                              final bookmark = data['bookmark'];
+                              return IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    widget.postModel.bookmark =
+                                        !widget.postModel.bookmark;
+                                  });
+                                  firestoreDatabase.updatePostData(
+                                      widget.docID, widget.postModel.bookmark);
+                                },
+                                icon:bookmark
+                                    ? const Icon(Icons.bookmark)
+                                    : const Icon(Icons.bookmark_add_outlined),
+                              );
+                            } else {
+                              return const CircularProgressIndicator();
+                            }
+                          },
                         ),
+                        // Bookmark(
+                        //   docID: widget.docID,
+                        // ),
                         // Comment
+                        // FutureBuilder(
+                        //   future: firestoreDatabase.up,
+                        //   builder: builder,
+                        // ),
                         Comment(
                           docID: widget.docID,
                         ),

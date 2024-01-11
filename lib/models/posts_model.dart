@@ -7,6 +7,7 @@ class PostModel {
   String? postmessage;
   List<dynamic>? like;
   Timestamp? timestamp;
+  bool bookmark = false;
 
   PostModel({
     required this.username,
@@ -14,6 +15,7 @@ class PostModel {
     required this.postmessage,
     required this.like,
     required this.timestamp,
+    required this.bookmark,
   });
 
   formatDate(Timestamp? timestamp) {
@@ -28,5 +30,18 @@ class PostModel {
     postmessage = json['postmessage'];
     timestamp = json['timestamp'];
     like = json['like'];
+    bookmark = json['bookmark'];
   }
 }
+
+
+// factory PostModel.fromJson(Map<String, dynamic> json) {
+//     return PostModel(
+//       username: json['username'],
+//       useremail: json['useremail'],
+//       postmessage: json['postmessage'],
+//       like: json['like'],
+//       timestamp: json['timestamp'],
+//       bookmark: json['bookmark'],
+//     );
+//   }

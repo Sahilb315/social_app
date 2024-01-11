@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/database/firestore.dart';
 
@@ -75,7 +76,7 @@ class _CommentState extends State<Comment> {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: onPressedComment,
-      icon: const Icon(Icons.comment),
+      icon: const Icon(CupertinoIcons.bubble_left),
     );
   }
 }
