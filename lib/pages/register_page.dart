@@ -1,5 +1,7 @@
 // ignore_for_file: unused_local_variable
 
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,16 +20,20 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController email = TextEditingController();
-
   final TextEditingController pass = TextEditingController();
-
   final TextEditingController username = TextEditingController();
-
-  String get getCurrentUsername => username.toString();
-
   final TextEditingController confirmPass = TextEditingController();
 
   final user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void dispose() {
+    email.dispose();
+    pass.dispose();
+    username.dispose();
+    confirmPass.dispose();
+    super.dispose();
+  }
 
   void registerUser() async {
     // loading circle
@@ -42,6 +48,13 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.pop(context);
 
       diplayMessageToUser("Password's dont match", context);
+    } else if (pass.text.isEmpty ||
+        email.text.isEmpty ||
+        username.text.isEmpty ||
+        confirmPass.text.isEmpty) {
+      Navigator.pop(context);
+      diplayMessageToUser("Enter Information", context);
+      log("Enter Information");
     } else {
       try {
         UserCredential? userCredential =
@@ -53,6 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
         await userCredential.user!.updateDisplayName(username.text);
         await user!.reload();
 
+        // Navigator.pop(context);
         createUserDocument(userCredential);
         // pop loading circle
         if (context.mounted) Navigator.pop(context);
@@ -85,7 +99,6 @@ class _RegisterPageState extends State<RegisterPage> {
           .set({
         'email': userCredential.user!.email,
         'username': username.text,
-        // 'like': [],
       });
     }
   }
@@ -107,13 +120,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   size: 80,
                   color: Theme.of(context).colorScheme.inversePrimary,
                 ),
-
                 const SizedBox(
                   height: 20,
                 ),
                 // app name
                 const Text(
-                  "M I N I M A L",
+                  "R E G I S T E R",
                   style: TextStyle(fontSize: 20),
                 ),
 

@@ -17,22 +17,29 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController pass = TextEditingController();
 
   void loginUser() async {
-    // showDialog(
-    //   context: context,
-    //   builder: (context) => const Center(
-    //     child: CircularProgressIndicator(),
-    //   ),
-    // );
+    showDialog(
+      context: context,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email.text, password: pass.text);
-      // if (context.mounted) Navigator.pop(context);
+      if (context.mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
-        // Navigator.pop(context);
+        Navigator.pop(context);
         diplayMessageToUser(e.code, context);
       }
     }
+  }
+
+  @override
+  void dispose() {
+    email.dispose();
+    pass.dispose();
+    super.dispose();
   }
 
   @override
@@ -57,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               // app name
               const Text(
-                "M I N I M A L",
+                "L O G I N",
                 style: TextStyle(fontSize: 20),
               ),
 
