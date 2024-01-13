@@ -14,7 +14,7 @@ import 'package:social_app/provider/posts_provider.dart';
 import 'package:social_app/provider/profile_provider.dart';
 import 'package:social_app/routes/myroutes.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:social_app/theme/theme_provider.dart';
+import 'package:social_app/provider/theme_provider.dart';
 import 'firebase_options.dart';
 
 void main() async {

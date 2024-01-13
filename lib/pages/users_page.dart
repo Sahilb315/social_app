@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/components/list_tile_user.dart';
@@ -7,12 +5,11 @@ import 'package:social_app/helper/helper_function.dart';
 import 'package:social_app/models/user_model.dart';
 
 class UsersPage extends StatelessWidget {
-  UsersPage({super.key});
-
-  List<UserModel> usersList = [];
+  const UsersPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+  List<UserModel> usersList = [];
     return Scaffold(
       appBar: AppBar(
         title: const Text("U S E R S"),

@@ -36,6 +36,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void dispose() {
+    email.dispose();
+    pass.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -57,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               // app name
               const Text(
-                "M I N I M A L",
+                "L O G I N",
                 style: TextStyle(fontSize: 20),
               ),
 
