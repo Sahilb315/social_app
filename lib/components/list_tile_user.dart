@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 class MyUserListTile extends StatelessWidget {
   final String title;
   final String subTitle;
-  final String leadingTime;
   
   const MyUserListTile({
     super.key,
     required this.title,
     required this.subTitle,
-    required this.leadingTime,
+
   });
 
 
@@ -24,7 +23,7 @@ class MyUserListTile extends StatelessWidget {
         child: ListTile(
           title: Text(title),
           subtitle: Text(
-            "$subTitle . $leadingTime",
+            subTitle,
             style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
           

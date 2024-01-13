@@ -1,20 +1,34 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class CommentModel {
-  String? commentedBy;
-  String? commentedEmail;
-  String? content;
-  String? timestamp;
+  final String commentedBy;
+  final String commentedEmail;
+  final String content;
+  final String timestamp;
 
   CommentModel({
-    this.commentedBy,
-    this.commentedEmail,
-    this.content,
-    this.timestamp,
+    required this.commentedBy,
+    required this.commentedEmail,
+    required this.content,
+    required this.timestamp,
   });
 
-  CommentModel.fromJson(Map<String, dynamic> json) {
-    commentedBy = json['commentedBy'];
-    commentedEmail = json['commentedEmail'];
-    content = json['content'];
-    timestamp = json['timestamp'];
+  factory CommentModel.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return CommentModel(
+      commentedBy: data['commentedBy'],
+      commentedEmail: data['commentedEmail'],
+      content: data['content'],
+      timestamp: data['timestamp'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['commentedBy'] = commentedBy;
+    data['commentedEmail'] = commentedEmail;
+    data['content'] = content;
+    data['timestamp'] = timestamp;
+    return data;
   }
 }

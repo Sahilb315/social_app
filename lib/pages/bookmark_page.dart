@@ -1,9 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:social_app/components/back_button.dart';
+import 'package:provider/provider.dart';
 import 'package:social_app/components/list_tile_bookmark.dart';
-import 'package:social_app/database/firestore.dart';
+import 'package:social_app/helper/format_date.dart';
+import 'package:social_app/provider/bookmarks_provider.dart';
+import 'package:social_app/provider/posts_provider.dart';
 
 class BookmarkPage extends StatefulWidget {
   const BookmarkPage({super.key});
@@ -13,70 +15,33 @@ class BookmarkPage extends StatefulWidget {
 }
 
 class _BookmarkPageState extends State<BookmarkPage> {
-  FirestoreDatabase firestoreDatabase = FirestoreDatabase();
+  final user = FirebaseAuth.instance.currentUser;
+  @override
+  void initState() {
+    Provider.of<BookmarkProvider>(context, listen: false).fetchUsersBookmarks();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("B O O K M A R K S"),
+        centerTitle: true,
+      ),
       body: Column(
         children: [
-          // SizedBox(height: 50,),
-          const Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 50),
-                child: MyBackButton(),
-              ),
-              SizedBox(
-                width: 50,
-              ),
-              Text(
-                "B O O K M A R K S",
-                style: TextStyle(fontSize: 20),
-              ),
-            ],
-          ),
-          StreamBuilder(
-            stream: firestoreDatabase.showBookmarkPosts(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              final posts = snapshot.data!.docs;
-              if (snapshot.data == null || posts.isEmpty) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(25),
-                    child: Text(
-                      "No Bookmarks..",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                );
-              }
+          Consumer2<BookmarkProvider, PostsProvider>(
+            builder: (context, value, post, child) {
               return Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.all(0),
-                  itemCount: posts.length,
+                  itemCount: value.bookmarks.length,
                   itemBuilder: (context, index) {
-                    final post = posts[index];
-                    String docID = post.id;
-                    String message = post['postmessage'];
-                    String userEmail = post['useremail'];
-                    Timestamp timestamp = post['timestamp'];
-
-                    DateTime date = timestamp.toDate();
-                    final formatDate = DateFormat("yyyy-MM-dd").format(date);
-
                     return MyBookmarkListTile(
-                      title: message,
-                      subTitle: userEmail,
-                      leadingTime: formatDate.toString(),
-                      docID: docID,
+                      title: value.bookmarks[index].username,
+                      subTitle: value.bookmarks[index].postmessage,
+                      leadingTime: formatDate(value.bookmarks[index].timestamp),
+                      docID: value.bookmarks[index].id,
                     );
                   },
                 ),
