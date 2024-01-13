@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/database/firestore.dart';
 
@@ -6,12 +7,17 @@ class MyBookmarkListTile extends StatefulWidget {
   final String subTitle;
   final String leadingTime;
   final String docID;
+  // final VoidCallback onPressed;
+  // final bool bookmarkValue;
 
   const MyBookmarkListTile({
     super.key,
     required this.title,
     required this.subTitle,
-    required this.leadingTime, required this.docID,
+    required this.leadingTime,
+    required this.docID,
+    // required this.onPressed,
+    // required this.bookmarkValue,
   });
 
   @override
@@ -21,16 +27,6 @@ class MyBookmarkListTile extends StatefulWidget {
 class _MyBookmarkListTileState extends State<MyBookmarkListTile> {
   bool bookmarkOrNot = true;
   FirestoreDatabase firestoreDatabase = FirestoreDatabase();
-
-  void Function()? onPressed() {
-    setState(() {
-      bookmarkOrNot = !bookmarkOrNot;
-    });
-    if(bookmarkOrNot == false){
-      firestoreDatabase.updatePostData(widget.docID, false);
-    }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,13 +42,12 @@ class _MyBookmarkListTileState extends State<MyBookmarkListTile> {
             "${widget.subTitle} . ${widget.leadingTime}",
             style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
-          trailing: bookmarkOrNot
-              ? IconButton(
-                  onPressed: onPressed, icon: const Icon(Icons.bookmark))
-              : IconButton(
-                  onPressed: onPressed,
-                  icon: const Icon(Icons.bookmark_add_outlined),
-                ),
+          // trailing: IconButton(
+          //   onPressed: widget.onPressed,
+          //   icon: widget.bookmarkValue
+          //       ? const Icon(CupertinoIcons.bookmark_fill)
+          //       : const Icon(CupertinoIcons.bookmark),
+          // ),
         ),
       ),
     );

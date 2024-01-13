@@ -1,8 +1,12 @@
+// ignore_for_file: file_names
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social_app/components/drawer.dart';
 import 'package:social_app/components/my_list_tile.dart';
-import 'package:social_app/database/firestore.dart';
 import 'package:social_app/models/posts_model.dart';
+import 'package:social_app/provider/posts_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,13 +17,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController postController = TextEditingController();
-  FirestoreDatabase firestoreDatabase = FirestoreDatabase();
   List<PostModel> postList = [];
 
   @override
   void initState() {
-    // BookmarkProvider provider = Provider.of(context,listen: false);
-    // provider.fetchBookmark();
+    Provider.of<PostsProvider>(context, listen: false).fetchPosts();
     super.initState();
   }
 
@@ -35,64 +37,45 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).colorScheme.background,
       ),
       drawer: const MyDrawer(),
-      floatingActionButton: FloatingActionButton(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.blue,
-        shape: const StadiumBorder(),
-        onPressed: () => firestoreDatabase.postMessage(context, postController),
-        child: const Icon(Icons.add),
-      ),
-      body: Column(
+      // floatingActionButton:
+      body: Stack(
         children: [
-          Expanded(
-            child: StreamBuilder(
-              stream: firestoreDatabase.getPosts(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                final posts = snapshot.data!.docs;
-                if (snapshot.data == null || posts.isEmpty) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(25),
-                      child: Text(
-                        "No Posts..",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
+          Consumer<PostsProvider>(
+            builder: (context, value, child) {
+              log("In Home Consumer");
+              final postList = value.list;
+              return Center(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: postList.length,
+                        itemBuilder: (context, index) {
+                          return MyListTile(
+                            docID: postList[index].id,
+                            index: index,
+                            postModel: postList[index],
+                            date: postList[index].timestamp.toString(),
+                          );
+                        },
                       ),
                     ),
-                  );
-                }
-                postList = posts
-                    .map(
-                      (doc) => PostModel.fromJson(
-                          doc.data() as Map<String, dynamic>),
-                    )
-                    .toList();
-                return ListView.builder(
-                  itemCount: posts.length,
-                  itemBuilder: (context, index) {
-                    final newPosts = postList[index];
-                    final post = posts[index];
-                    final docID = post.id;
-                    final date =
-                        newPosts.formatDate(newPosts.timestamp).toString();
-                        // log(newPosts.bookmark.toString());
-
-                    return MyListTile(
-                      index: index,
-                      date: date,
-                      docID: docID,
-                      postModel: newPosts,
-                    );
-                  },
-                );
-              },
+                  ],
+                ),
+              );
+            },
+          ),
+          Positioned(
+            bottom: 20,
+            right: 15,
+            child: FloatingActionButton(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blue,
+              shape: const StadiumBorder(),
+              onPressed: () => context
+                  .read<PostsProvider>()
+                  .showDailog(context, postController),
+              child: const Icon(Icons.add),
             ),
           ),
         ],

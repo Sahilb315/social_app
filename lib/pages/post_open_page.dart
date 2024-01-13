@@ -1,22 +1,26 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social_app/components/comment_tile.dart';
-import 'package:social_app/components/like.dart';
-import 'package:social_app/database/firestore.dart';
-import 'package:social_app/components/comment.dart';
+import 'package:social_app/helper/format_date.dart';
 import 'package:social_app/helper/hashtag.dart';
-import 'package:social_app/models/comments_model.dart';
 import 'package:social_app/models/posts_model.dart';
+import 'package:social_app/provider/comments_povider.dart';
+import 'package:social_app/provider/posts_provider.dart';
 
 class PostOpenPage extends StatefulWidget {
   final String docID;
   final PostModel postModel;
+  final int index;
 
   const PostOpenPage({
     super.key,
     required this.docID,
     required this.postModel,
+    required this.index,
   });
 
   @override
@@ -25,9 +29,16 @@ class PostOpenPage extends StatefulWidget {
 
 class PostOpenPageState extends State<PostOpenPage> {
   User? user = FirebaseAuth.instance.currentUser;
+  final commentController = TextEditingController();
 
-  FirestoreDatabase firestoreDatabase = FirestoreDatabase();
-  List<CommentModel> commentsList = [];
+  @override
+  void initState() {
+    Provider.of<PostsProvider>(context, listen: false)
+        .fetchPostDocumentById(widget.docID);
+    Provider.of<CommentsProvider>(context, listen: false)
+        .fetchComments(widget.docID);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,193 +49,189 @@ class PostOpenPageState extends State<PostOpenPage> {
         backgroundColor: Theme.of(context).colorScheme.background,
         title: const Text('Post'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(14.0),
-        child: SingleChildScrollView(
-          child: SizedBox(
-            width: double.infinity,
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+      body: Consumer2<PostsProvider, CommentsProvider>(
+        builder: (context, post, comment, child) {
+          log("In Open Page consumer");
+          return Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: SingleChildScrollView(
+              child: SizedBox(
+                width: double.infinity,
+                child: Column(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.only(right: 8.0),
-                      child: CircleAvatar(
-                        backgroundColor: Colors.red,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: CircleAvatar(
+                            backgroundColor: Colors.red,
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  post.post.username,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              post.post.useremail,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 14,
                     ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        HashtagView(
+                          text: post.post.postmessage,
+                          maxLines: null,
+                          textOverflow: TextOverflow.visible,
+                          textSize: 20,
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.postModel.username.toString(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
+                              formatDate(post.post.timestamp),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
-                        Text(
-                          widget.postModel.useremail.toString(),
+                        const SizedBox(
+                          height: 8,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 14,
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    HashtagView(
-                      text: widget.postModel.postmessage.toString(),
-                      maxLines: null,
-                      textOverflow: TextOverflow.visible,
-                      textSize: 20,
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.postModel.timestamp.toString(),
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    const Divider(
-                      height: 0,
-                    ),
-                    Row(
-                      children: [
-                        FutureBuilder(
-                          future: FirebaseFirestore.instance
-                              .collection("post")
-                              .doc(widget.docID)
-                              .get(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              final data =
-                                  snapshot.data!.data() as Map<String, dynamic>;
-                              final bookmark = data['bookmark'];
-                              return IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    widget.postModel.bookmark =
-                                        !widget.postModel.bookmark;
-                                  });
-                                  firestoreDatabase.updatePostData(
-                                      widget.docID, widget.postModel.bookmark);
-                                },
-                                icon:bookmark
-                                    ? const Icon(Icons.bookmark)
-                                    : const Icon(Icons.bookmark_add_outlined),
-                              );
-                            } else {
-                              return const CircularProgressIndicator();
-                            }
-                          },
-                        ),
-                        // Bookmark(
-                        //   docID: widget.docID,
-                        // ),
-                        // Comment
-                        // FutureBuilder(
-                        //   future: firestoreDatabase.up,
-                        //   builder: builder,
-                        // ),
-                        Comment(
-                          docID: widget.docID,
-                        ),
-                        // Like
-                        LikeButton(
-                          postID: widget.docID,
-                          likes: widget.postModel.like!.toList(),
-                        ),
-                      ],
-                    ),
-                    const Divider(
-                      height: 0,
-                    ),
-                    StreamBuilder(
-                      stream: firestoreDatabase.getComments(widget.docID),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return Center(
-                            child: Center(
-                              child: Text(
-                                ".",
-                                style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inversePrimary,
-                                ),
+                        const Divider(height: 0),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                post.updatePostBookmark(
+                                    widget.docID, widget.index);
+                              },
+                              icon: post.list[widget.index].bookmark
+                                      .contains(user!.email)
+                                  ? const Icon(CupertinoIcons.bookmark_fill)
+                                  : Icon(
+                                      CupertinoIcons.bookmark,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .inversePrimary,
+                                    ),
+                            ),
+                            Text(
+                              post.list[widget.index].bookmark.length
+                                  .toString(),
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                comment.showDailog(
+                                  context,
+                                  commentController,
+                                  widget.docID,
+                                  post.list[widget.index].username,
+                                );
+                              },
+                              icon: Icon(
+                                CupertinoIcons.bubble_left,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
                               ),
                             ),
-                          );
-                        } else if (snapshot.hasData) {
-                          final commentsDoc = snapshot.data!.docs;
-                          commentsList = commentsDoc
-                              .map(
-                                (doc) => CommentModel.fromJson(
-                                    doc.data() as Map<String, dynamic>),
-                              )
-                              .toList();
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: commentsDoc.length,
-                            itemBuilder: (context, index) {
-                              final newComments = commentsList[index];
-                              return CommentTile(
-                                postModel: widget.postModel,
-                                commentModel: newComments,
+                            Text(comment.comments.length.toString()),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                post.updatePostLike(
+                                  widget.docID,
+                                  widget.index,
+                                );
+                              },
+                              icon: post.list[widget.index].like
+                                      .contains(user!.email)
+                                  // true
+                                  ? const Icon(
+                                      CupertinoIcons.heart_fill,
+                                      color: Colors.red,
+                                    )
+                                  : Icon(
+                                      CupertinoIcons.heart,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .inversePrimary,
+                                    ),
+                            ),
+                            Text(
+                              post.list[widget.index].like.length.toString(),
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                        const Divider(height: 0),
+                        Consumer<CommentsProvider>(
+                          builder: (context, comment, child) {
+                            if (comment.comments.isEmpty) {
+                              return const Center(
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: 20),
+                                    Text(
+                                      "No Comments ...",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               );
-                            },
-                          );
-                          //*            Another way to get Data
-                          // return ListView(
-                          //   shrinkWrap: true,
-                          //   physics: const NeverScrollableScrollPhysics(),
-                          //   children: snapshot.data!.docs.map((doc) {
-                          //     final commentData =
-                          //         doc.data() as Map<String, dynamic>;
-
-                          //     return ListTile(
-                          //       title: Text(commentData['content'].toString()),
-                          //     );
-                          //   }).toList(),
-                          // );
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else {
-                          return Center(
-                            child: Text(snapshot.error.toString()),
-                          );
-                        }
-                      },
+                            }
+                            return ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: comment.comments.length,
+                              itemBuilder: (context, index) {
+                                return CommentTile(
+                                  commentModel: comment.comments[index],
+                                  postModel: post.list[index],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

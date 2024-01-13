@@ -1,15 +1,23 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:social_app/components/back_button.dart';
 import 'package:social_app/components/list_tile_user.dart';
 import 'package:social_app/helper/helper_function.dart';
+import 'package:social_app/models/user_model.dart';
 
 class UsersPage extends StatelessWidget {
-  const UsersPage({Key? key}) : super(key: key);
+  UsersPage({super.key});
+
+  List<UserModel> usersList = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("U S E R S"),
+        centerTitle: true,
+      ),
       backgroundColor: Theme.of(context).colorScheme.background,
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('user').snapshots(),
@@ -28,39 +36,19 @@ class UsersPage extends StatelessWidget {
           }
           // get all users
           final users = snapshot.data!.docs;
-
+          usersList = users.map((doc) => UserModel.fromFirestore(doc)).toList();
           return Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 60.0, left: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    MyBackButton(),
-                    SizedBox(
-                      width: 90,
-                    ),
-                    Text(
-                      "U S E R S",
-                      style: TextStyle(fontSize: 20),
-                    )
-                  ],
-                ),
-              ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: users.length,
-                  padding: const EdgeInsets.only(top: 15),
+                  itemCount: usersList.length,
+                  padding: const EdgeInsets.only(top: 15, right: 10),
                   itemBuilder: (context, index) {
-                    final user = users[index];
-                    final username = user['username'];
-                    final email = user['email'];
                     return Padding(
                       padding: const EdgeInsets.only(left: 12.0),
                       child: MyUserListTile(
-                        title: username,
-                        subTitle: email,
-                        leadingTime: "",
+                        title: usersList[index].username,
+                        subTitle: usersList[index].email,
                       ),
                     );
                   },

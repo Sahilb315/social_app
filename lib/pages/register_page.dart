@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:social_app/components/my_button.dart';
 import 'package:social_app/components/my_textfield.dart';
 import 'package:social_app/helper/helper_function.dart';
@@ -48,17 +49,29 @@ class _RegisterPageState extends State<RegisterPage> {
           email: email.text,
           password: pass.text,
         );
-        
-       await userCredential.user!.updateDisplayName(username.text);
-       await user!.reload();
+
+        await userCredential.user!.updateDisplayName(username.text);
+        await user!.reload();
 
         createUserDocument(userCredential);
         // pop loading circle
         if (context.mounted) Navigator.pop(context);
       } on FirebaseAuthException catch (e) {
+        // Catch FirebaseAuthException
         if (context.mounted) {
           Navigator.pop(context);
-          diplayMessageToUser(e.code, context);
+          diplayMessageToUser(e.message ?? "An error occurred", context);
+        }
+      } on PlatformException catch (e) {
+        // Catch specific exception type
+        if (context.mounted) {
+          Navigator.pop(context);
+          diplayMessageToUser(e.toString(), context);
+        }
+      } catch (e) {
+        if (context.mounted) {
+          Navigator.pop(context);
+          diplayMessageToUser(e.toString(), context);
         }
       }
     }
