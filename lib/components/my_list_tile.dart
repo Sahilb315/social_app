@@ -141,7 +141,7 @@ class _MyListTileState extends State<MyListTile> {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    commentProvider.showDailog(
+                                    commentProvider.addCommentSheet(
                                       context,
                                       commentController,
                                       widget.docID,
