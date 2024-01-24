@@ -6,6 +6,7 @@ import 'package:social_app/models/posts_model.dart';
 
 class ProfileProvider extends ChangeNotifier {
   List<PostModel> _usersPostList = [];
+  List<PostModel> get usersPostList => _usersPostList;
   PostModel _userModel = PostModel(
     bookmark: [],
     id: "",
@@ -16,7 +17,6 @@ class ProfileProvider extends ChangeNotifier {
     timestamp: Timestamp.now(),
   );
   PostModel get userModel => _userModel;
-  List<PostModel> get usersPostList => _usersPostList;
 
   List<CommentModel> _usersReplies = [];
   List<CommentModel> get usersReplies => _usersReplies;
@@ -51,8 +51,9 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Future<void> deletePost(PostModel model) async {
-  //   await firestore.doc(model.id).delete();
-  //   fetchPostsByUser();
-  // }
+  Future<void> deletePost(String id, String? email) async {
+    print(id);
+    await firestore.doc(id).delete();
+    fetchPostsByUser(email);
+  }
 }

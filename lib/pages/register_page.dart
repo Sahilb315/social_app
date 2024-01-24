@@ -35,7 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  void registerUser() async {
+  void registerUser(BuildContext context) async {
     // loading circle
     showDialog(
       context: context,
@@ -175,7 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 // sign in btn
                 MyButton(
                   text: "Register",
-                  onTap: registerUser,
+                  onTap:()=> registerUser(context),
                 ),
                 const SizedBox(
                   height: 18,

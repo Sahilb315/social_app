@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:social_app/database/firestore.dart';
 import 'package:social_app/helper/hashtag.dart';
 import 'package:social_app/models/comments_model.dart';
 import 'package:social_app/models/posts_model.dart';
@@ -19,7 +18,6 @@ class CommentTile extends StatefulWidget {
 }
 
 class _CommentTileState extends State<CommentTile> {
-  FirestoreDatabase firestoreDatabase = FirestoreDatabase();
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:social_app/database/firestore.dart';
 
 class MyBookmarkListTile extends StatefulWidget {
   final String title;
@@ -26,7 +24,6 @@ class MyBookmarkListTile extends StatefulWidget {
 
 class _MyBookmarkListTileState extends State<MyBookmarkListTile> {
   bool bookmarkOrNot = true;
-  FirestoreDatabase firestoreDatabase = FirestoreDatabase();
 
   @override
   Widget build(BuildContext context) {

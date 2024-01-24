@@ -5,9 +5,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/models/posts_model.dart';
 
+enum DataStatus {
+  fetching,
+  fetched,
+  error,
+  initial;
+}
+
 class PostsProvider extends ChangeNotifier {
   List<PostModel> _postList = [];
   List<PostModel> get list => _postList;
+
+  set postList(List<PostModel> list) {
+    _postList = list;
+    notifyListeners();
+  }
 
   PostModel _postModel = PostModel(
     id: "",
@@ -19,6 +31,9 @@ class PostsProvider extends ChangeNotifier {
     bookmark: [],
   );
   PostModel get post => _postModel;
+
+  User? user = FirebaseAuth.instance.currentUser;
+  final firestore = FirebaseFirestore.instance.collection("post");
 
   Future<void> updatePostLike(String docID, int index) async {
     // log(docID);
@@ -34,7 +49,7 @@ class PostsProvider extends ChangeNotifier {
     fetchPosts();
   }
 
-   updatePostBookmark(String docID, int index) async {
+ Future<void> updatePostBookmark(String docID, int index) async {
     log(docID);
     if (_postList[index].bookmark.contains(user!.email)) {
       log("Remove");
@@ -50,10 +65,14 @@ class PostsProvider extends ChangeNotifier {
     fetchPosts();
   }
 
-  User? user = FirebaseAuth.instance.currentUser;
-  final firestore = FirebaseFirestore.instance.collection("post");
+  var currentStatus = DataStatus.initial;
+  void change(DataStatus status) {
+    currentStatus = status;
+  }
 
-  void fetchPosts() async {
+  Future<void> fetchPosts() async {
+    change(DataStatus.fetching);
+    log(currentStatus.name);
     try {
       final snapshot =
           await firestore.orderBy('timestamp', descending: true).get();
@@ -71,8 +90,11 @@ class PostsProvider extends ChangeNotifier {
           bookmark: doc.data()['bookmark'],
         );
       }).toList();
+      change(DataStatus.fetched);
+      log(currentStatus.name);
       notifyListeners();
     } catch (e) {
+      change(DataStatus.error);
       log(e.toString());
     }
   }

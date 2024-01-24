@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:social_app/database/firestore.dart';
 import 'package:social_app/helper/hashtag.dart';
 import 'package:social_app/helper/timeago_messages.dart';
 import 'package:social_app/models/posts_model.dart';
@@ -31,7 +30,6 @@ class MyListTile extends StatefulWidget {
 }
 
 class _MyListTileState extends State<MyListTile> {
-  FirestoreDatabase firestoreDatabase = FirestoreDatabase();
   final user = FirebaseAuth.instance.currentUser;
   final commentController = TextEditingController();
   @override
