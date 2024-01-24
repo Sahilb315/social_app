@@ -82,7 +82,6 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           Expanded(
-            
             child: TabBarView(
               controller: tabController,
               children: [
@@ -107,6 +106,8 @@ class _ProfilePageState extends State<ProfilePage>
                                   child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       const CircleAvatar(
                                         foregroundImage: NetworkImage(
@@ -235,6 +236,31 @@ class _ProfilePageState extends State<ProfilePage>
                                               },
                                             ),
                                           ],
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showBottomSheet(
+                                            context: context,
+                                            builder: (context) {
+                                              return SizedBox(
+                                                child: ListTile(
+                                                  leading: const Icon(
+                                                    CupertinoIcons.delete,
+                                                  ),
+                                                  title:
+                                                      const Text("Delete Post"),
+                                                  onTap: () => value.deletePost(
+                                                      value.usersPostList[index]
+                                                          .id,
+                                                      user!.email),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: const Icon(
+                                          Icons.more_vert_outlined,
                                         ),
                                       ),
                                     ],

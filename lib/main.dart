@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         routes: {
           MyRoutes.homePage: (context) => const HomePage(),
-          MyRoutes.usersPage: (context) =>  UsersPage(),
+          MyRoutes.usersPage: (context) => const UsersPage(),
           MyRoutes.profilePage: (context) => const ProfilePage(),
           MyRoutes.bookmarkPage: (context) => const BookmarkPage(),
           MyRoutes.settingsPage: (context) => const SettingsPage(),

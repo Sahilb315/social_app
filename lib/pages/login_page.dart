@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:social_app/components/my_button.dart';
 import 'package:social_app/components/my_textfield.dart';
 import 'package:social_app/helper/helper_function.dart';
@@ -16,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController email = TextEditingController();
   final TextEditingController pass = TextEditingController();
 
-  void loginUser() async {
+  void loginUser(BuildContext context) async {
     showDialog(
       context: context,
       builder: (context) => const Center(
@@ -27,10 +28,21 @@ class _LoginPageState extends State<LoginPage> {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email.text, password: pass.text);
       if (context.mounted) Navigator.pop(context);
+    } on PlatformException catch (e) {
+      // Catch specific exception type
+      if (context.mounted) {
+        Navigator.pop(context);
+        diplayMessageToUser(e.toString(), context);
+      }
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
         Navigator.pop(context);
         diplayMessageToUser(e.code, context);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context);
+        diplayMessageToUser(e.toString(), context);
       }
     }
   }
@@ -106,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
               // sign in btn
               MyButton(
                 text: "Login",
-                onTap: loginUser,
+                onTap: () => loginUser(context),
               ),
               const SizedBox(height: 18),
               // dont have acc? register

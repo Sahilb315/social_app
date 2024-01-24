@@ -11,7 +11,7 @@ class CommentsProvider extends ChangeNotifier {
   final firestore = FirebaseFirestore.instance.collection("post");
   final user = FirebaseAuth.instance.currentUser;
 
-  fetchComments(
+ Future<void> fetchComments(
     String docID,
   ) async {
     try {
