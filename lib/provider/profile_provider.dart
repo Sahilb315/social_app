@@ -45,9 +45,9 @@ class ProfileProvider extends ChangeNotifier {
         .get();
     _usersReplies =
         snapshot.docs.map((doc) => CommentModel.fromFirestore(doc)).toList();
-    for (var element in _usersReplies) {
-      print(element.toMap());
-    }
+    // for (var element in _usersReplies) {
+    //   print(element.toMap());
+    // }
     notifyListeners();
   }
 

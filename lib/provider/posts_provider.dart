@@ -49,7 +49,7 @@ class PostsProvider extends ChangeNotifier {
     fetchPosts();
   }
 
- Future<void> updatePostBookmark(String docID, int index) async {
+  Future<void> updatePostBookmark(String docID, int index) async {
     log(docID);
     if (_postList[index].bookmark.contains(user!.email)) {
       log("Remove");
@@ -72,7 +72,7 @@ class PostsProvider extends ChangeNotifier {
 
   Future<void> fetchPosts() async {
     change(DataStatus.fetching);
-    log(currentStatus.name);
+    // log(currentStatus.name);
     try {
       final snapshot =
           await firestore.orderBy('timestamp', descending: true).get();
@@ -91,7 +91,7 @@ class PostsProvider extends ChangeNotifier {
         );
       }).toList();
       change(DataStatus.fetched);
-      log(currentStatus.name);
+      // log(currentStatus.name);
       notifyListeners();
     } catch (e) {
       change(DataStatus.error);
@@ -109,7 +109,9 @@ class PostsProvider extends ChangeNotifier {
         'like': model.like,
         'username': model.username,
       });
+      log("Adding Posts");
       fetchPosts();
+      log("Posts Added");
     } catch (e) {
       log(e.toString());
     }
@@ -127,7 +129,8 @@ class PostsProvider extends ChangeNotifier {
     }
   }
 
-  void showDailog(BuildContext context, TextEditingController postController) {
+  void addPostsSheet(
+      BuildContext context, TextEditingController postController) {
     showBottomSheet(
       backgroundColor: Theme.of(context).colorScheme.background,
       context: context,
@@ -135,7 +138,7 @@ class PostsProvider extends ChangeNotifier {
         height: double.infinity,
         width: double.infinity,
         child: Padding(
-          padding: const EdgeInsets.only(top: 42, left: 10, right: 5),
+          padding: const EdgeInsets.only(left: 10, right: 5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

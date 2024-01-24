@@ -1,7 +1,3 @@
-// ignore_for_file: file_names, unrelated_type_equality_checks
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/components/drawer.dart';
@@ -44,13 +40,18 @@ class _HomePageState extends State<HomePage> {
                 color: Theme.of(context).colorScheme.inversePrimary,
               ),
             )
-          : Stack(
-              children: [
-                Consumer<PostsProvider>(
-                  builder: (context, value, child) {
-                    log("In Home Consumer");
-                    final postList = value.list;
-                    return Center(
+          : Consumer<PostsProvider>(
+              builder: (context, value, child) {
+                final postList = value.list;
+
+                return Stack(
+                  children: [
+                    // Consumer<PostsProvider>(
+                    //   builder: (context, value, child) {
+                    //     log("In Home Consumer");
+                    //     final postList = value.list;
+                    //     return
+                    Center(
                       child: Column(
                         children: [
                           Expanded(
@@ -68,23 +69,24 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                    );
-                  },
-                ),
-                Positioned(
-                  bottom: 20,
-                  right: 15,
-                  child: FloatingActionButton(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blue,
-                    shape: const StadiumBorder(),
-                    onPressed: () => context
-                        .read<PostsProvider>()
-                        .showDailog(context, postController),
-                    child: const Icon(Icons.add),
-                  ),
-                ),
-              ],
+                    ),
+
+                    //   },
+                    // ),
+                    Positioned(
+                      bottom: 20,
+                      right: 15,
+                      child: FloatingActionButton(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.blue,
+                        shape: const StadiumBorder(),
+                        onPressed: () => value.addPostsSheet(context, postController),
+                        child: const Icon(Icons.add),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
     );
   }

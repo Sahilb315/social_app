@@ -147,7 +147,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                             ),
                             IconButton(
                               onPressed: () {
-                                comment.showDailog(
+                              comment.addCommentSheet(
                                   context,
                                   commentController,
                                   widget.docID,
