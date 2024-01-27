@@ -1,16 +1,35 @@
 # social_app
 
-A new Flutter project.
+## Table of contents
 
-## Getting Started
+  - [Screenshot](#screenshot)
+  - [Description](#description)
+  - [Built with](#built-with)
+  - [What I learned](#what-i-learned)
+  - [Author](#author)
 
-This project is a starting point for a Flutter application.
+### Screenshot
+![Alt text](assets/SS1.jpg) 
+![Alt text](assets/SS2.jpg) 
+![Alt text](assets/SS3.jpg) 
+![Alt text](assets/SS4.jpg) 
+![Alt text](assets/SS5.jpg)
 
-A few resources to get you started if this is your first Flutter project:
+## Description
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+A Social App which is similar to X(Twitter) which has features like User's Authentication and an Full- Fledged Backend. The user can Post, Reply, Like - Comment - Bookmark and interact with other users. The user can also switch between Light & Dark mode which enhances the user's experience.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Built with
+
+- Flutter
+- Cloud Firestore
+- Provider(State Management)
+- Firebase Authentication
+
+### What I learned
+I learned how to handle large amount of data from cloud firestore like the users personal information, their Posts & Replies, etc.
+It was challenging to work with Provider and handle the states but after using it for some time, finally understood it.
+
+## Author
+- LinkedIn - [Sahil Bansal] (https://www.linkedin.com/in/sahil-bansal-882b41272/)
+- Twitter - [@Sahil121315](https://x.com/Sahil121315?t=91yHYBDE2vjBnehGdAjZ0Q&s=09)
