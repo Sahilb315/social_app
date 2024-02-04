@@ -46,26 +46,67 @@ class ProfilePostsTabPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(value.usersPostList[index].username
-                                        .toString()),
-                                    //* If want to display the users email ↓
-                                    // Text(
-                                    //   "  ${widget.postModel.useremail.toString()}",
-                                    //   style: TextStyle(
-                                    //     color: Theme.of(context)
-                                    //         .colorScheme
-                                    //         .inversePrimary,
-                                    //   ),
-                                    // ),
-                                    Text(
-                                      " ${timeago.format(value.usersPostList[index].timestamp.toDate(), locale: 'en_short')}",
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .inversePrimary,
-                                      ),
+                                    Row(
+                                      children: [
+                                        Text(value.usersPostList[index].username
+                                            .toString()),
+                                        //* If want to display the users email ↓
+                                        // Text(
+                                        //   "  ${widget.postModel.useremail.toString()}",
+                                        //   style: TextStyle(
+                                        //     color: Theme.of(context)
+                                        //         .colorScheme
+                                        //         .inversePrimary,
+                                        //   ),
+                                        // ),
+                                        Text(
+                                          " ${timeago.format(value.usersPostList[index].timestamp.toDate(), locale: 'en_short')}",
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .inversePrimary,
+                                          ),
+                                        ),
+                                      ],
                                     ),
+                                    PopupMenuButton(
+                                      itemBuilder: (context) {
+                                        return [
+                                          PopupMenuItem(
+                                            onTap: () {
+                                              value.deletePost(
+                                                value.usersPostList[index].id,
+                                                value.usersPostList[index]
+                                                    .useremail,
+                                              );
+                                            },
+                                            value: "Delete",
+                                            child: Text(
+                                              "Delete",
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .inversePrimary,
+                                              ),
+                                            ),
+                                          ),
+                                          PopupMenuItem(
+                                            value: "Edit",
+                                            child: Text(
+                                              "Edit",
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .inversePrimary,
+                                              ),
+                                            ),
+                                          ),
+                                        ];
+                                      },
+                                    )
                                   ],
                                 ),
                                 HashtagView(

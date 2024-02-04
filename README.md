@@ -31,5 +31,5 @@ I learned how to handle large amount of data from cloud firestore like the users
 It was challenging to work with Provider and handle the states but after using it for some time, finally understood it.
 
 ## Author
-- LinkedIn - [Sahil Bansal] (https://www.linkedin.com/in/sahil-bansal-882b41272/)
+- LinkedIn - [Sahil Bansal] (https://www.linkedin.com/in/%F0%9F%8E%AF-sahil-bansal-882b41272/)
 - Twitter - [@Sahil121315](https://x.com/Sahil121315?t=91yHYBDE2vjBnehGdAjZ0Q&s=09)
