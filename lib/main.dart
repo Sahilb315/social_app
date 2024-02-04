@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:social_app/auth/auth.dart';
-import 'package:social_app/auth/login_or_register.dart';
+import 'package:social_app/helper/user_session/auth.dart';
+import 'package:social_app/helper/user_session/login_or_register.dart';
 import 'package:social_app/pages/home_page.dart';
 import 'package:social_app/pages/bookmark_page.dart';
 import 'package:social_app/pages/profile_page.dart';
@@ -12,7 +12,7 @@ import 'package:social_app/provider/comments_povider.dart';
 import 'package:social_app/provider/login_register_provider.dart';
 import 'package:social_app/provider/posts_provider.dart';
 import 'package:social_app/provider/profile_provider.dart';
-import 'package:social_app/routes/myroutes.dart';
+import 'package:social_app/utils/routes/myroutes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:social_app/provider/theme_provider.dart';
 import 'firebase_options.dart';

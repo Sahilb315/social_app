@@ -102,13 +102,18 @@ class PostsProvider extends ChangeNotifier {
   Future<void> addPost(PostModel model) async {
     try {
       await firestore.add({
+        "id": "",
         'useremail': model.useremail,
         'postmessage': model.postmessage,
         'timestamp': model.timestamp,
         'bookmark': model.bookmark,
         'like': model.like,
         'username': model.username,
-      });
+      }).then(
+        (value) async {
+          await firestore.doc(value.id).update({'id': value.id});
+        },
+      );
       log("Adding Posts");
       fetchPosts();
       log("Posts Added");

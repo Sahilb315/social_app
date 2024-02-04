@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social_app/routes/myroutes.dart';
+import 'package:social_app/utils/routes/myroutes.dart';
 
 class MyDrawer extends StatefulWidget {
   const MyDrawer({super.key});
@@ -156,7 +156,6 @@ class _MyDrawerState extends State<MyDrawer> {
                 style: TextStyle(fontSize: 18),
               ),
               onTap: () {
-                Navigator.pop(context);
                 FirebaseAuth.instance.signOut();
               },
             ),

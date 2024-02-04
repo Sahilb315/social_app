@@ -45,15 +45,12 @@ class ProfileProvider extends ChangeNotifier {
         .get();
     _usersReplies =
         snapshot.docs.map((doc) => CommentModel.fromFirestore(doc)).toList();
-    // for (var element in _usersReplies) {
-    //   print(element.toMap());
-    // }
     notifyListeners();
   }
 
   Future<void> deletePost(String id, String? email) async {
-    print(id);
     await firestore.doc(id).delete();
     fetchPostsByUser(email);
+    notifyListeners();
   }
 }

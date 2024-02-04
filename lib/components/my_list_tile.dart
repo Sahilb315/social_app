@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +10,13 @@ import 'package:social_app/provider/comments_povider.dart';
 import 'package:social_app/provider/posts_provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class MyListTile extends StatefulWidget {
+class PostTile extends StatefulWidget {
   final String docID;
   final int index;
   final PostModel postModel;
   final String date;
 
-  const MyListTile({
+  const PostTile({
     super.key,
     required this.docID,
     required this.index,
@@ -26,10 +25,10 @@ class MyListTile extends StatefulWidget {
   });
 
   @override
-  State<MyListTile> createState() => _MyListTileState();
+  State<PostTile> createState() => _PostTileState();
 }
 
-class _MyListTileState extends State<MyListTile> {
+class _PostTileState extends State<PostTile> {
   final user = FirebaseAuth.instance.currentUser;
   final commentController = TextEditingController();
   @override
@@ -44,12 +43,25 @@ class _MyListTileState extends State<MyListTile> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => PostOpenPage(
-              postModel: widget.postModel,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                PostOpenPage(
               docID: widget.docID,
+              postModel: widget.postModel,
               index: widget.index,
             ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              var begin = const Offset(1.0, 0.0);
+              var end = Offset.zero;
+              var curve = Curves.ease;
+              final tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
           ),
         );
       },
@@ -131,11 +143,12 @@ class _MyListTileState extends State<MyListTile> {
                                               .inversePrimary,
                                         ),
                                 ),
-                                 Text(
-                              postProvider.list[widget.index].bookmark.length
-                                  .toString(),
-                              style: const TextStyle(fontSize: 16),
-                            ),
+                                Text(
+                                  postProvider
+                                      .list[widget.index].bookmark.length
+                                      .toString(),
+                                  style: const TextStyle(fontSize: 16),
+                                ),
                                 const SizedBox(
                                   width: 10,
                                 ),

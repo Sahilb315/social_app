@@ -71,13 +71,11 @@ class _RegisterPageState extends State<RegisterPage> {
         // pop loading circle
         if (context.mounted) Navigator.pop(context);
       } on FirebaseAuthException catch (e) {
-        // Catch FirebaseAuthException
         if (context.mounted) {
           Navigator.pop(context);
           diplayMessageToUser(e.message ?? "An error occurred", context);
         }
       } on PlatformException catch (e) {
-        // Catch specific exception type
         if (context.mounted) {
           Navigator.pop(context);
           diplayMessageToUser(e.toString(), context);
@@ -159,19 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   controller: confirmPass,
                 ),
                 const SizedBox(height: 10),
-                // forgot pass
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.end,
-                //   children: [
-                //     Text(
-                //       "Forgot Password",
-                //       style: TextStyle(
-                //         color: Theme.of(context).colorScheme.secondary,
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                const SizedBox(height: 25),
+                // const SizedBox(height: 25),
                 // sign in btn
                 MyButton(
                   text: "Register",

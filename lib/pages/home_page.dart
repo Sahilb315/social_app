@@ -43,14 +43,8 @@ class _HomePageState extends State<HomePage> {
           : Consumer<PostsProvider>(
               builder: (context, value, child) {
                 final postList = value.list;
-
                 return Stack(
                   children: [
-                    // Consumer<PostsProvider>(
-                    //   builder: (context, value, child) {
-                    //     log("In Home Consumer");
-                    //     final postList = value.list;
-                    //     return
                     Center(
                       child: Column(
                         children: [
@@ -58,7 +52,7 @@ class _HomePageState extends State<HomePage> {
                             child: ListView.builder(
                               itemCount: postList.length,
                               itemBuilder: (context, index) {
-                                return MyListTile(
+                                return PostTile(
                                   docID: postList[index].id,
                                   index: index,
                                   postModel: postList[index],
@@ -70,9 +64,6 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-
-                    //   },
-                    // ),
                     Positioned(
                       bottom: 20,
                       right: 15,
@@ -80,7 +71,10 @@ class _HomePageState extends State<HomePage> {
                         foregroundColor: Colors.white,
                         backgroundColor: Colors.blue,
                         shape: const StadiumBorder(),
-                        onPressed: () => value.addPostsSheet(context, postController),
+                        onPressed: () => value.addPostsSheet(
+                          context,
+                          postController,
+                        ),
                         child: const Icon(Icons.add),
                       ),
                     ),
