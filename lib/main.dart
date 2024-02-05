@@ -43,19 +43,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Builder(
-      builder: (context) => MaterialApp(
-        home: const AuthPage(),
-        theme: Provider.of<ThemeProvider>(context).themeData,
-        debugShowCheckedModeBanner: false,
-        routes: {
-          MyRoutes.homePage: (context) => const HomePage(),
-          MyRoutes.usersPage: (context) => const UsersPage(),
-          MyRoutes.profilePage: (context) => const ProfilePage(),
-          MyRoutes.bookmarkPage: (context) => const BookmarkPage(),
-          MyRoutes.settingsPage: (context) => const SettingsPage(),
-          MyRoutes.loginOrRegisterPage: (context) => const LoginOrRegister(),
-        },
-      ),
+      builder: (context) {
+        return MaterialApp(
+          home: const AuthPage(),
+          theme: Provider.of<ThemeProvider>(context).themeData,
+          themeMode: ThemeMode.system,
+          debugShowCheckedModeBanner: false,
+          routes: {
+            MyRoutes.homePage: (context) => const HomePage(),
+            MyRoutes.usersPage: (context) => const UsersPage(),
+            MyRoutes.profilePage: (context) => const ProfilePage(),
+            MyRoutes.bookmarkPage: (context) => const BookmarkPage(),
+            MyRoutes.settingsPage: (context) => const SettingsPage(),
+            MyRoutes.loginOrRegisterPage: (context) => const LoginOrRegister(),
+          },
+        );
+      },
     );
   }
 }

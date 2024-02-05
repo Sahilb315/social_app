@@ -23,7 +23,6 @@ class MyBookmarkListTile extends StatefulWidget {
 }
 
 class _MyBookmarkListTileState extends State<MyBookmarkListTile> {
-  bool bookmarkOrNot = true;
 
   @override
   Widget build(BuildContext context) {
