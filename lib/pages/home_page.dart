@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/components/drawer.dart';
-import 'package:social_app/components/my_list_tile.dart';
+import 'package:social_app/components/post_tile.dart';
 import 'package:social_app/models/posts_model.dart';
 import 'package:social_app/provider/posts_provider.dart';
 
@@ -19,7 +20,14 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     Provider.of<PostsProvider>(context, listen: false).fetchPosts();
+    Provider.of<PostsProvider>(context, listen: false).user =
+        FirebaseAuth.instance.currentUser;
+
     super.initState();
+  }
+
+  Future<void> refresh() async {
+    Provider.of<PostsProvider>(context, listen: false).fetchPosts();
   }
 
   @override
@@ -40,47 +48,44 @@ class _HomePageState extends State<HomePage> {
                 color: Theme.of(context).colorScheme.inversePrimary,
               ),
             )
-          : Consumer<PostsProvider>(
-              builder: (context, value, child) {
-                final postList = value.list;
-                return Stack(
-                  children: [
-                    Center(
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: postList.length,
-                              itemBuilder: (context, index) {
-                                return PostTile(
-                                  docID: postList[index].id,
-                                  index: index,
-                                  postModel: postList[index],
-                                  date: postList[index].timestamp.toString(),
-                                );
-                              },
+          : RefreshIndicator.adaptive(
+              color: Theme.of(context).colorScheme.inversePrimary,
+              onRefresh: refresh,
+              child: Stack(
+                children: [
+                  Consumer<PostsProvider>(
+                    builder: (context, value, child) {
+                      final postList = value.list;
+                      return Center(
+                        child: ListView(
+                          children: List.generate(
+                            value.list.length,
+                            (index) => PostTile(
+                              docID: postList[index].id,
+                              index: index,
+                              postModel: postList[index],
+                              date: postList[index].timestamp.toString(),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 20,
-                      right: 15,
-                      child: FloatingActionButton(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.blue,
-                        shape: const StadiumBorder(),
-                        onPressed: () => value.addPostsSheet(
-                          context,
-                          postController,
                         ),
-                        child: const Icon(Icons.add),
-                      ),
+                      );
+                    },
+                  ),
+                  Positioned(
+                    bottom: 20,
+                    right: 15,
+                    child: FloatingActionButton(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blue,
+                      shape: const StadiumBorder(),
+                      onPressed: () =>
+                          Provider.of<PostsProvider>(context, listen: false)
+                              .addPostsSheet(context, postController),
+                      child: const Icon(Icons.add),
                     ),
-                  ],
-                );
-              },
+                  ),
+                ],
+              ),
             ),
     );
   }

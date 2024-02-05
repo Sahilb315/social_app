@@ -11,7 +11,7 @@ class CommentsProvider extends ChangeNotifier {
   final firestore = FirebaseFirestore.instance.collection("post");
   final user = FirebaseAuth.instance.currentUser;
 
- Future<void> fetchComments(
+  Future<void> fetchComments(
     String docID,
   ) async {
     try {
@@ -36,134 +36,140 @@ class CommentsProvider extends ChangeNotifier {
   }
 
   void addCommentSheet(
-  BuildContext context,
-  TextEditingController commentController,
-  String docID,
-  String username,
-) {
-  showBottomSheet(
-    backgroundColor: Theme.of(context).colorScheme.background,
-    context: context,
-    builder: (context) => SizedBox(
-      height: double.infinity,
-      width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    BuildContext context,
+    TextEditingController commentController,
+    String docID,
+    String username,
+  ) {
+    showBottomSheet(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      context: context,
+      builder: (context) => SizedBox(
+        height: double.infinity,
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10, right: 5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(Icons.clear_rounded),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (commentController.text.isNotEmpty) {
+                          addComments(
+                            CommentModel(
+                              commentedBy: user!.displayName.toString(),
+                              commentedEmail: user!.email.toString(),
+                              content: commentController.text,
+                              timestamp: Timestamp.now().toString(),
+                            ),
+                            docID,
+                          );
+                        }
+                        Navigator.pop(context);
+                        commentController.clear();
+                      },
+                      style: const ButtonStyle(
+                          backgroundColor:
+                              MaterialStatePropertyAll(Colors.blue)),
+                      child: const Text(
+                        "Reply",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.clear_rounded),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 18.0,
+                    ),
+                    child: SizedBox(
+                      height: MediaQuery.sizeOf(context).height * 0.05,
+                      child: const VerticalDivider(
+                        thickness: 1.5,
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (commentController.text.isNotEmpty) {
-                        addComments(
-                          CommentModel(
-                            commentedBy: user!.displayName.toString(),
-                            commentedEmail: user!.email.toString(),
-                            content: commentController.text,
-                            timestamp: Timestamp.now().toString(),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 22.0),
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Replying to",
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                            fontSize: 17),
+                        children: [
+                          TextSpan(
+                            text: " @$username",
+                            style: const TextStyle(
+                              color: Colors.blue,
+                            ),
                           ),
-                          docID,
-                        );
-                      }
-                      Navigator.pop(context);
-                      commentController.clear();
-                    },
-                    style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(Colors.blue)),
-                    child: const Text(
-                      "Reply",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                        ],
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 18.0,
+              // const SizedBox(
+              //   height: 10,
+              // ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CircleAvatar(
+                    backgroundColor: Colors.blue,
+                    radius: 26,
                   ),
-                  child: SizedBox(
-                    height: MediaQuery.sizeOf(context).height * 0.05,
-                    child: const VerticalDivider(
-                      thickness: 1.5,
-                      color: Colors.black,
-                    ),
+                  const SizedBox(
+                    width: 10,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 22.0),
-                  child: RichText(
-                    text: TextSpan(
-                      text: "Replying to",
-                      style: const TextStyle(color: Colors.black, fontSize: 17),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        TextSpan(
-                          text: " @$username",
-                          style: const TextStyle(
-                            color: Colors.blue,
+                        TextField(
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.inversePrimary),
+                          controller: commentController,
+                          keyboardType: TextInputType.multiline,
+                          cursorColor: Colors.grey.shade400,
+                          maxLines: null,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Post your reply",
+                            hintStyle: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ],
-            ),
-            // const SizedBox(
-            //   height: 10,
-            // ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  radius: 26,
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextField(
-                        controller: commentController,
-                        keyboardType: TextInputType.multiline,
-                        cursorColor: Colors.grey.shade400,
-                        maxLines: null,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "Post your reply",
-                          hintStyle: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ],
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

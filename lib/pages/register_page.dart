@@ -57,19 +57,21 @@ class _RegisterPageState extends State<RegisterPage> {
       log("Enter Information");
     } else {
       try {
+        if (context.mounted) Navigator.pop(context);
+
         UserCredential? userCredential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email.text,
-          password: pass.text,
+          email: email.text.trim(),
+          password: pass.text.trim(),
         );
-
-        await userCredential.user!.updateDisplayName(username.text);
-        await user!.reload();
+        if (user != null) {
+          await userCredential.user!.updateDisplayName(username.text);
+          await user!.reload();
+        }
 
         // Navigator.pop(context);
         createUserDocument(userCredential);
         // pop loading circle
-        if (context.mounted) Navigator.pop(context);
       } on FirebaseAuthException catch (e) {
         if (context.mounted) {
           Navigator.pop(context);
@@ -161,7 +163,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 // sign in btn
                 MyButton(
                   text: "Register",
-                  onTap:()=> registerUser(context),
+                  onTap: () => registerUser(context),
                 ),
                 const SizedBox(
                   height: 18,

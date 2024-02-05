@@ -32,7 +32,7 @@ class PostsProvider extends ChangeNotifier {
   );
   PostModel get post => _postModel;
 
-  User? user = FirebaseAuth.instance.currentUser;
+  User? user;
   final firestore = FirebaseFirestore.instance.collection("post");
 
   Future<void> updatePostLike(String docID, int index) async {
@@ -99,6 +99,14 @@ class PostsProvider extends ChangeNotifier {
     }
   }
 
+  // Stream getPosts() {
+  //   final snapshot =
+  //       firestore.orderBy('timestamp', descending: true).snapshots();
+  //   List<PostModel> list =
+  //       snapshot.map((event) => PostModel.fromFirestore(event.docs.first)).toList();
+  //   return snapshot;
+  // }
+
   Future<void> addPost(PostModel model) async {
     try {
       await firestore.add({
@@ -136,14 +144,18 @@ class PostsProvider extends ChangeNotifier {
 
   void addPostsSheet(
       BuildContext context, TextEditingController postController) {
-    showBottomSheet(
-      backgroundColor: Theme.of(context).colorScheme.background,
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (context) => SizedBox(
-        height: double.infinity,
+        height: MediaQuery.sizeOf(context).height * 1,
         width: double.infinity,
         child: Padding(
-          padding: const EdgeInsets.only(left: 10, right: 5),
+          padding: EdgeInsets.only(
+            left: 10,
+            right: 5,
+            top: MediaQuery.sizeOf(context).height * 0.05,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -158,6 +170,8 @@ class PostsProvider extends ChangeNotifier {
                     ),
                     ElevatedButton(
                       onPressed: () {
+                        log(user!.displayName.toString());
+                        log(user!.email.toString());
                         if (postController.text.isNotEmpty) {
                           addPost(
                             PostModel(
@@ -207,6 +221,9 @@ class PostsProvider extends ChangeNotifier {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         TextField(
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                          ),
                           controller: postController,
                           keyboardType: TextInputType.multiline,
                           cursorColor: Colors.grey.shade400,

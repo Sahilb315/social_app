@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:social_app/components/post_tile_icons.dart';
 import 'package:social_app/helper/hashtag.dart';
 import 'package:social_app/helper/timeago_messages.dart';
 import 'package:social_app/models/posts_model.dart';
@@ -76,13 +77,14 @@ class _PostTileState extends State<PostTile> {
                   )
                 : const SizedBox.shrink(),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const CircleAvatar(
                     foregroundImage: NetworkImage(
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvi7HpQ-_PMSMOFrj1hwjp6LDcI-jm3Ro0Xw&usqp=CAU"),
+                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvi7HpQ-_PMSMOFrj1hwjp6LDcI-jm3Ro0Xw&usqp=CAU",
+                    ),
                   ),
                   const SizedBox(
                     width: 10,
@@ -123,81 +125,79 @@ class _PostTileState extends State<PostTile> {
                         Consumer2<PostsProvider, CommentsProvider>(
                           builder:
                               (context, postProvider, commentProvider, child) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    postProvider.updatePostBookmark(
-                                      widget.docID,
-                                      widget.index,
-                                    );
-                                  },
-                                  icon: postProvider.list[widget.index].bookmark
-                                          .contains(user!.email)
-                                      ? const Icon(CupertinoIcons.bookmark_fill)
-                                      : Icon(
-                                          CupertinoIcons.bookmark,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inversePrimary,
-                                        ),
-                                ),
-                                Text(
-                                  postProvider
-                                      .list[widget.index].bookmark.length
-                                      .toString(),
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    commentProvider.addCommentSheet(
-                                      context,
-                                      commentController,
-                                      widget.docID,
-                                      postProvider.list[widget.index].username,
-                                    );
-                                  },
-                                  icon: Icon(
-                                    CupertinoIcons.bubble_left,
-                                    color: Theme.of(context)
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  //?   BOOKMARK
+                                  IconsContainer(
+                                    value: postProvider
+                                        .list[widget.index].bookmark
+                                        .contains(user!.email),
+                                    text: postProvider
+                                        .list[widget.index].bookmark.length
+                                        .toString(),
+                                    iconFalse: CupertinoIcons.bookmark,
+                                    iconTrue: CupertinoIcons.bookmark_fill,
+                                    colorTrue:
+                                        Theme.of(context).colorScheme.secondary,
+                                    onPressed: () {
+                                      postProvider.updatePostBookmark(
+                                        widget.docID,
+                                        widget.index,
+                                      );
+                                    },
+                                  ),
+                                  //?   RETWEET
+                                  IconsContainer(
+                                    value: false,
+                                    iconFalse: CupertinoIcons.repeat,
+                                    iconTrue: CupertinoIcons.repeat,
+                                    onPressed: () {},
+                                    colorTrue: Colors.green,
+                                  ),
+                                  //?   COMMENT
+                                  IconsContainer(
+                                    value: true,
+                                    iconFalse: CupertinoIcons.bubble_left,
+                                    iconTrue: CupertinoIcons.bubble_left,
+                                    colorTrue: Theme.of(context)
                                         .colorScheme
                                         .inversePrimary,
+                                    onPressed: () {
+                                      commentProvider.addCommentSheet(
+                                        context,
+                                        commentController,
+                                        widget.docID,
+                                        postProvider
+                                            .list[widget.index].username,
+                                      );
+                                    },
                                   ),
-                                ),
-                                // Text(commentProvider.comments.length.toString()),
-                                const SizedBox(
-                                  width: 0,
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    postProvider.updatePostLike(
-                                      widget.docID,
-                                      widget.index,
-                                    );
-                                  },
-                                  icon: postProvider.list[widget.index].like
-                                          .contains(user!.email)
-                                      // true
-                                      ? const Icon(
-                                          CupertinoIcons.heart_fill,
-                                          color: Colors.red,
-                                        )
-                                      : Icon(
-                                          CupertinoIcons.heart,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inversePrimary,
-                                        ),
-                                ),
-                                Text(
-                                  postProvider.list[widget.index].like.length
-                                      .toString(),
-                                ),
-                              ],
+                                  //?   LIKE
+                                  IconsContainer(
+                                    value: postProvider.list[widget.index].like
+                                        .contains(user!.email),
+                                    text: postProvider
+                                        .list[widget.index].like.length
+                                        .toString(),
+                                    iconFalse: CupertinoIcons.heart,
+                                    iconTrue: CupertinoIcons.heart_fill,
+                                    colorTrue: Colors.red,
+                                    onPressed: () {
+                                      postProvider.updatePostLike(
+                                        widget.docID,
+                                        widget.index,
+                                      );
+                                    },
+                                  ),
+                                  // To arrange the icons
+                                  const SizedBox()
+                                ],
+                              ),
                             );
                           },
                         ),
