@@ -1,6 +1,10 @@
+// ignore_for_file: unrelated_type_equality_checks
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/components/my_button.dart';
+import 'package:social_app/pages/create_account/need_account_page.dart';
 import 'package:social_app/provider/theme_provider.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -13,20 +17,56 @@ class SettingsPage extends StatelessWidget {
         title: const Text("S E T T I N G S"),
         centerTitle: true,
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24),
-              child: MyButton(
-                text: "Theme",
-                onTap: () {
-                  Provider.of<ThemeProvider>(context, listen: false)
-                      .toggleThemes();
-                },
+            MyButton(
+              text: "Theme",
+              onTap: () {
+                Provider.of<ThemeProvider>(context, listen: false)
+                    .toggleThemes();
+              },
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            GestureDetector(
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                if (!context.mounted) return;
+                //? popUntil removes all the routes till the conditions are met and even the NeedAccountPage is removed & then 
+                //? push to the new page 
+                Navigator.popUntil(context, (route) => const NeedAccountPage() == route);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const NeedAccountPage()));
+              },
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.logout_rounded,
+                      size: 30,
+                    ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    Text(
+                      "L O G O U T",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
               ),
-            )
+            ),
           ],
         ),
       ),

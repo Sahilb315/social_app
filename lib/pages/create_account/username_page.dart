@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/helper/format_date.dart';
 import 'package:social_app/pages/create_account/profile_pic_page.dart';
 
 class UsernamePage extends StatefulWidget {
@@ -72,6 +73,7 @@ class _UsernamePageState extends State<UsernamePage> {
         'email': userCredential.user!.email,
         'username': usernameController.text,
         'dob': widget.dateOfBirth,
+        'joined': formatDate(Timestamp.now())
       });
     }
   }
@@ -120,7 +122,6 @@ class _UsernamePageState extends State<UsernamePage> {
                   controller: usernameController,
                   cursorColor: Colors.blue,
                   cursorRadius: const Radius.circular(12),
-                  obscureText: true,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(

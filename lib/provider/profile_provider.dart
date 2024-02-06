@@ -1,44 +1,74 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/models/comments_model.dart';
 import 'package:social_app/models/posts_model.dart';
+import 'package:social_app/models/user_model.dart';
 
 class ProfileProvider extends ChangeNotifier {
   List<PostModel> _usersPostList = [];
   List<PostModel> get usersPostList => _usersPostList;
-  PostModel _userModel = PostModel(
-    bookmark: [],
-    id: "",
-    useremail: "",
+  UserModel _userModel = UserModel(
+    dob: "",
+    name: "",
+    email: "",
     username: "",
-    like: [],
-    postmessage: "",
-    timestamp: Timestamp.now(),
+    joined: "",
+    bio: "",
+    location: "",
+    field: "",
+    followers: 0,
+    following: 0,
   );
-  PostModel get userModel => _userModel;
+  UserModel get userModel => _userModel;
 
   List<CommentModel> _usersReplies = [];
   List<CommentModel> get usersReplies => _usersReplies;
 
-  User? user = FirebaseAuth.instance.currentUser;
-  final firestore = FirebaseFirestore.instance.collection("post");
+  final postsFirestore = FirebaseFirestore.instance.collection("post");
+  final userFirestore = FirebaseFirestore.instance.collection("user");
 
-  Future<void> fetchDetailsOfUser(String? email) async {
-    final snapshot = await firestore.where('useremail', isEqualTo: email).get();
-    _userModel = snapshot.docs.map((e) => PostModel.fromFirestore(e)).first;
+  Future<void> editUserProfileDetails({
+    required String? email,
+    required String name,
+    required String bio,
+    required String location,
+    required String field,
+  }) async {
+    await userFirestore.doc(email).update({
+      'bio': bio,
+      'name': name,
+      'field': field,
+      'location': location,
+    });
+    log("Updated user ${_userModel.toMap().toString()}");
+    fetchDetails(email);
+    notifyListeners();
+    // log("Updated user ${_userModel.toMap().toString()}");
+  }
+
+  Future<void> fetchDetails(String? email) async {
+    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
+        .collection('user')
+        .where('email', isEqualTo: email)
+        .get();
+    _userModel = snapshot.docs.map((e) => UserModel.fromFirestore(e)).first;
+    log(_userModel.toMap().toString());
     notifyListeners();
   }
 
   Future<void> fetchPostsByUser(String? email) async {
-    final snapshot = await firestore.where('useremail', isEqualTo: email).get();
+    final snapshot =
+        await postsFirestore.where('useremail', isEqualTo: email).get();
     _usersPostList =
         snapshot.docs.map((doc) => PostModel.fromFirestore(doc)).toList();
     notifyListeners();
   }
 
   Future<void> fetchRepliesByUser(String? email) async {
-    final snapshot = await firestore
+    final snapshot = await postsFirestore
         .doc("YiMgK6p7EwkQPxVdd8xT")
         .collection('comments')
         .where("commentedEmail", isEqualTo: email)
@@ -49,7 +79,7 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   Future<void> deletePost(String id, String? email) async {
-    await firestore.doc(id).delete();
+    await postsFirestore.doc(id).delete();
     fetchPostsByUser(email);
     notifyListeners();
   }

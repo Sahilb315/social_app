@@ -5,10 +5,11 @@ import 'package:social_app/pages/home_page.dart';
 import 'package:social_app/pages/bookmark_page.dart';
 import 'package:social_app/pages/profile_page.dart';
 import 'package:social_app/pages/settings_page.dart';
-import 'package:social_app/pages/users_page.dart';
+import 'package:social_app/pages/chat_page.dart';
 import 'package:social_app/provider/bookmarks_provider.dart';
 import 'package:social_app/provider/comments_povider.dart';
 import 'package:social_app/provider/login_register_provider.dart';
+import 'package:social_app/provider/navigation_provider.dart';
 import 'package:social_app/provider/posts_provider.dart';
 import 'package:social_app/provider/profile_provider.dart';
 import 'package:social_app/utils/routes/myroutes.dart';
@@ -30,6 +31,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => CommentsProvider()),
         ChangeNotifierProvider(create: (context) => BookmarkProvider()),
         ChangeNotifierProvider(create: (context) => LoginRegisterProvider()),
+        ChangeNotifierProvider(create: (context) => NavigationProvider()),
       ],
       child: const MyApp(),
     ),
@@ -50,7 +52,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           routes: {
             MyRoutes.homePage: (context) => const HomePage(),
-            MyRoutes.usersPage: (context) => const UsersPage(),
+            MyRoutes.usersPage: (context) => const ChatPage(),
             MyRoutes.profilePage: (context) => const ProfilePage(),
             MyRoutes.bookmarkPage: (context) => const BookmarkPage(),
             MyRoutes.settingsPage: (context) => const SettingsPage(),

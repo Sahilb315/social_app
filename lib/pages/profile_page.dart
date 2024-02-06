@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:social_app/pages/edit_profile_page.dart';
 import 'package:social_app/pages/profile_tab_page/posts_tab.dart';
 import 'package:social_app/pages/profile_tab_page/replies_tab.dart';
 import 'package:social_app/provider/profile_provider.dart';
@@ -20,7 +21,7 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void initState() {
     Provider.of<ProfileProvider>(context, listen: false)
-        .fetchDetailsOfUser(user.email);
+        .fetchDetails(user.email);
     Provider.of<ProfileProvider>(context, listen: false)
         .fetchPostsByUser(user.email);
     Provider.of<ProfileProvider>(context, listen: false)
@@ -31,7 +32,7 @@ class _ProfilePageState extends State<ProfilePage>
 
   Future<void> _refresh() async {
     Provider.of<ProfileProvider>(context, listen: false)
-        .fetchDetailsOfUser(user.email);
+        .fetchDetails(user.email);
     Provider.of<ProfileProvider>(context, listen: false)
         .fetchPostsByUser(user.email);
     Provider.of<ProfileProvider>(context, listen: false)
@@ -84,143 +85,207 @@ class _ProfilePageState extends State<ProfilePage>
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8),
-              child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Consumer<ProfileProvider>(
+                builder: (context, value, child) {
+                  var profile = value.userModel;
+                  return Column(
                     children: [
-                      Column(
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            user.displayName.toString(),
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                profile.name,
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "@${profile.username}",
+                              ),
+                            ],
                           ),
-                          Text(
-                            user.email.toString(),
+                          OutlinedButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        EditProfilePage(
+                                  name: profile.name,
+                                  location: profile.location,
+                                  bio: profile.bio,
+                                  field: profile.field,
+                                ),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  var begin = const Offset(1.0, 0.0);
+                                  var end = Offset.zero;
+                                  var curve = Curves.easeIn;
+
+                                  var tween = Tween(begin: begin, end: end)
+                                      .chain(CurveTween(curve: curve));
+                                  return SlideTransition(
+                                    position: animation.drive(tween),
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            ),
+                            child: Text(
+                              "Edit Profile",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      OutlinedButton(
-                        onPressed: () {},
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      //? BIO
+                      Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
-                          "Edit Profile",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.inversePrimary,
-                            fontSize: 16,
+                          profile.bio,
+                          style: const TextStyle(
+                            fontSize: 15,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Text(
-                    "Coding Enthusiastic | Basic Java | Dart | Flutter | Android development | Firebase",
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    children: [
-                      const Icon(
-                        CupertinoIcons.briefcase,
-                        size: 16,
                       ),
                       const SizedBox(
-                        width: 5,
+                        height: 10,
                       ),
-                      Expanded(
-                        child: Text(
-                          "Software developer/Programmer/Software engineer",
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
+                      //? FIELD
+                      Row(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.briefcase,
+                            size: 16,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    children: [
-                      const Icon(
-                        CupertinoIcons.calendar,
-                        size: 16,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Expanded(
-                        child: Text(
-                          "Joined December 2020",
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
+                          const SizedBox(
+                            width: 5,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.inversePrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17,
-                          ),
-                          text: "230",
-                          children: const [
-                            TextSpan(
-                              text: " Following",
+                          Expanded(
+                            child: Text(
+                              profile.field,
                               style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.normal,
+                                color: Colors.grey.shade600,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       const SizedBox(
-                        width: 15,
+                        height: 10,
                       ),
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
+                      //? DOB
+                      Row(
+                        children: [
+                          Image.asset(
+                            "assets/balloon.png",
+                            width: 20,
+                            height: 17,
                             color: Theme.of(context).colorScheme.inversePrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17,
                           ),
-                          text: "98",
-                          children: const [
-                            TextSpan(
-                              text: " Followers",
+                          Text(
+                            "Born ${profile.dob}",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      //? Joined
+                      Row(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.calendar,
+                            size: 16,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Expanded(
+                            child: Text(
+                              "Joined ${profile.joined}",
                               style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.normal,
+                                color: Colors.grey.shade600,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      //? Following
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                              ),
+                              text: profile.following.toString(),
+                              children: const [
+                                TextSpan(
+                                  text: " Following",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          //? Followers
+                          RichText(
+                            text: TextSpan(
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                              ),
+                              text: profile.followers.toString(),
+                              children: const [
+                                TextSpan(
+                                  text: " Followers",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
                     ],
-                  )
-                ],
+                  );
+                },
               ),
             ),
             const SizedBox(
