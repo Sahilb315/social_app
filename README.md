@@ -9,11 +9,11 @@
   - [Author](#author)
 
 ### Screenshot
-![Alt text](assets/SS1.jpg) 
-![Alt text](assets/SS2.jpg) 
-![Alt text](assets/SS3.jpg) 
-![Alt text](assets/SS4.jpg) 
-![Alt text](assets/SS5.jpg)
+![Alt text](assets/SS-1.jpg) 
+![Alt text](assets/SS-2.jpg) 
+![Alt text](assets/SS-3.jpg) 
+![Alt text](assets/SS-4.jpg) 
+![Alt text](assets/SS-5.jpg)
 
 ## Description
 
