@@ -4,8 +4,8 @@ import 'package:social_app/components/list_tile_user.dart';
 import 'package:social_app/helper/helper_function.dart';
 import 'package:social_app/models/user_model.dart';
 
-class UsersPage extends StatelessWidget {
-  const UsersPage({super.key});
+class ChatPage extends StatelessWidget {
+  const ChatPage({super.key});
 
   @override
   Widget build(BuildContext context) {

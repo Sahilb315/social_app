@@ -19,6 +19,8 @@
 
 A Social App which is similar to X(Twitter) which has features like User's Authentication and an Full- Fledged Backend. The user can Post, Reply, Like - Comment - Bookmark and interact with other users. The user can also switch between Light & Dark mode which enhances the user's experience.
 
+The user can edit his profile and enter details like Bio, Location, Field(He works in or Interested in)
+
 ### Built with
 
 - Flutter

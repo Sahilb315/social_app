@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:social_app/pages/home_page.dart';
+import 'package:social_app/pages/navigation_page.dart';
 
 class LoginUserPasswordPage extends StatefulWidget {
   final String email;
@@ -159,7 +159,7 @@ class _LoginUserPasswordPageState extends State<LoginUserPasswordPage> {
                           PageRouteBuilder(
                             pageBuilder:
                                 (context, animation, secondaryAnimation) =>
-                                    const HomePage(),
+                                    const NavigationPage(),
                             transitionsBuilder: (context, animation,
                                 secondaryAnimation, child) {
                               var begin = const Offset(1.0, 0.0);
