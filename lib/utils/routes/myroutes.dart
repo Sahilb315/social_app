@@ -8,4 +8,11 @@ class MyRoutes {
   static String settingsPage = "/settingsPage";
   static String loginOrRegisterPage = "/loginorRegisterPage";
   static String openPostPage = '/openPostPage';
+  static String needAccount = '/needAccount';
+  static String createAccount = '/createAccount';
+  static String enterPassword = '/enterPassword';
+  static String usernamePage = '/usernamePage';
+  static String profilePicPage = '/profilePicPage';
+  static String loginUser = '/loginUser';
+  static String loginUserPassword = '/loginUserPassword';
 }

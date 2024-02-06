@@ -1,9 +1,7 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:social_app/components/list_tile_bookmark.dart';
-import 'package:social_app/helper/format_date.dart';
+import 'package:social_app/components/post_tile.dart';
 import 'package:social_app/provider/bookmarks_provider.dart';
 import 'package:social_app/provider/posts_provider.dart';
 
@@ -37,11 +35,11 @@ class _BookmarkPageState extends State<BookmarkPage> {
                 child: ListView.builder(
                   itemCount: value.bookmarks.length,
                   itemBuilder: (context, index) {
-                    return MyBookmarkListTile(
-                      title: value.bookmarks[index].username,
-                      subTitle: value.bookmarks[index].postmessage,
-                      leadingTime: formatDate(value.bookmarks[index].timestamp),
-                      docID: value.bookmarks[index].id,
+                    return PostTile(
+                      docID:  value.bookmarks[index].id,
+                      index: index,
+                      postModel: post.list[index],
+                      date: post.list[index].timestamp.toString(),
                     );
                   },
                 ),

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,13 +18,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController postController = TextEditingController();
   List<PostModel> postList = [];
+  late final user;
 
   @override
   void initState() {
     Provider.of<PostsProvider>(context, listen: false).fetchPosts();
     Provider.of<PostsProvider>(context, listen: false).user =
         FirebaseAuth.instance.currentUser;
-
+    user = FirebaseAuth.instance.currentUser!;
     super.initState();
   }
 
@@ -60,12 +63,14 @@ class _HomePageState extends State<HomePage> {
                         child: ListView(
                           children: List.generate(
                             value.list.length,
-                            (index) => PostTile(
-                              docID: postList[index].id,
-                              index: index,
-                              postModel: postList[index],
-                              date: postList[index].timestamp.toString(),
-                            ),
+                            (index) {
+                              return PostTile(
+                                docID: postList[index].id,
+                                index: index,
+                                postModel: postList[index],
+                                date: postList[index].timestamp.toString(),
+                              );
+                            },
                           ),
                         ),
                       );

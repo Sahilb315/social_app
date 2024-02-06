@@ -30,10 +30,11 @@ class PostTile extends StatefulWidget {
 }
 
 class _PostTileState extends State<PostTile> {
-  final user = FirebaseAuth.instance.currentUser;
+  late final user;
   final commentController = TextEditingController();
   @override
   void initState() {
+    user = FirebaseAuth.instance.currentUser;
     timeago.setLocaleMessages('my_en', MyCustomMessages());
     super.initState();
   }

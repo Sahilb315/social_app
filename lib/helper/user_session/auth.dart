@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social_app/helper/user_session/login_or_register.dart';
+import 'package:social_app/pages/create_account/need_account_page.dart';
 import 'package:social_app/pages/home_page.dart';
 
 class AuthPage extends StatelessWidget {
@@ -15,7 +15,7 @@ class AuthPage extends StatelessWidget {
           if (snapshot.hasData) {
             return const HomePage();
           } else {
-            return const LoginOrRegister();
+            return const NeedAccountPage();
           }
         },
       ),
