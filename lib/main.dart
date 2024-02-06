@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/helper/user_session/auth.dart';
-import 'package:social_app/helper/user_session/login_or_register.dart';
 import 'package:social_app/pages/home_page.dart';
 import 'package:social_app/pages/bookmark_page.dart';
 import 'package:social_app/pages/profile_page.dart';
@@ -55,7 +54,6 @@ class MyApp extends StatelessWidget {
             MyRoutes.profilePage: (context) => const ProfilePage(),
             MyRoutes.bookmarkPage: (context) => const BookmarkPage(),
             MyRoutes.settingsPage: (context) => const SettingsPage(),
-            MyRoutes.loginOrRegisterPage: (context) => const LoginOrRegister(),
           },
         );
       },

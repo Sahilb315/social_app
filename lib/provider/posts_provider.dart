@@ -114,8 +114,8 @@ class PostsProvider extends ChangeNotifier {
         'useremail': model.useremail,
         'postmessage': model.postmessage,
         'timestamp': model.timestamp,
-        'bookmark': model.bookmark,
-        'like': model.like,
+        'bookmark': [],
+        'like': [],
         'username': model.username,
       }).then(
         (value) async {
