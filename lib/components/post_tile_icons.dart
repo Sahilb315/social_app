@@ -7,7 +7,7 @@ class IconsContainer extends StatelessWidget {
   final String? text;
   final Color? color;
   final Color? colorTrue;
-  final void Function() onPressed;
+  final void Function()? onPressed;
   const IconsContainer({
     super.key,
     required this.value,

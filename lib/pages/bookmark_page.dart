@@ -17,6 +17,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
   @override
   void initState() {
     Provider.of<BookmarkProvider>(context, listen: false).fetchUsersBookmarks();
+    Provider.of<BookmarkProvider>(context, listen: false).user = FirebaseAuth.instance.currentUser!;
     super.initState();
   }
 

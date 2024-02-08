@@ -13,8 +13,6 @@ class MyDrawer extends StatefulWidget {
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-  final User? user = FirebaseAuth.instance.currentUser;
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -54,11 +52,11 @@ class _MyDrawerState extends State<MyDrawer> {
                   currentAccountPicture: ClipRRect(
                     borderRadius: BorderRadius.circular(40),
                     child: Image.network(
-                      "https://img.freepik.com/free-vector/illustration-businessman_53876-5856.jpg?size=626&ext=jpg&ga=GA1.2.1573903318.1701284006&semt=ais",
+                      FirebaseAuth.instance.currentUser!.photoURL.toString(),
                     ),
                   ),
                   accountName: Text(
-                    user!.displayName.toString(),
+                    FirebaseAuth.instance.currentUser!.displayName.toString(),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

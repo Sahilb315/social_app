@@ -11,9 +11,11 @@ class UserModel {
   final String field;
   final int followers;
   final int following;
+  final String profileUrl;
 
   UserModel({
     required this.location,
+    required this.profileUrl,
     required this.followers,
     required this.following,
     required this.bio,
@@ -28,6 +30,7 @@ class UserModel {
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return UserModel(
+      profileUrl: data['profileUrl'],
       followers: data['followers'] ?? 0,
       following: data['following'] ?? 0,
       location: data['location'] ?? "",
@@ -53,6 +56,7 @@ class UserModel {
     data['field'] = field;
     data['followers'] = followers;
     data['following'] = following;
+    data['profileUrl'] = profileUrl;
     return data;
   }
 }

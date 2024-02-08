@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/components/comment_tile.dart';
+import 'package:social_app/components/post_tile_icons.dart';
 import 'package:social_app/helper/format_date.dart';
 import 'package:social_app/helper/hashtag.dart';
 import 'package:social_app/models/posts_model.dart';
@@ -15,12 +16,14 @@ class PostOpenPage extends StatefulWidget {
   final String docID;
   final PostModel postModel;
   final int index;
+  final String profileUrl;
 
   const PostOpenPage({
     super.key,
     required this.docID,
     required this.postModel,
     required this.index,
+    required this.profileUrl,
   });
 
   @override
@@ -37,6 +40,8 @@ class PostOpenPageState extends State<PostOpenPage> {
         .fetchPostDocumentById(widget.docID);
     Provider.of<CommentsProvider>(context, listen: false)
         .fetchComments(widget.docID);
+    Provider.of<CommentsProvider>(context, listen: false).user =
+        FirebaseAuth.instance.currentUser!;
     super.initState();
   }
 
@@ -62,10 +67,10 @@ class PostOpenPageState extends State<PostOpenPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.only(right: 8.0),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
                           child: CircleAvatar(
-                            backgroundColor: Colors.red,
+                            foregroundImage: NetworkImage(widget.profileUrl),
                           ),
                         ),
                         Column(
@@ -120,77 +125,105 @@ class PostOpenPageState extends State<PostOpenPage> {
                           height: 8,
                         ),
                         const Divider(height: 0),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                post.updatePostBookmark(
-                                    widget.docID, widget.index);
-                              },
-                              icon: post.list[widget.index].bookmark
-                                      .contains(user!.email)
-                                  ? const Icon(CupertinoIcons.bookmark_fill)
-                                  : Icon(
-                                      CupertinoIcons.bookmark,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .inversePrimary,
-                                    ),
-                            ),
-                            Text(
-                              post.list[widget.index].bookmark.length
-                                  .toString(),
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            IconButton(
-                              onPressed: () {
-                              comment.addCommentSheet(
-                                  context,
-                                  commentController,
-                                  widget.docID,
-                                  post.list[widget.index].username,
-                                );
-                              },
-                              icon: Icon(
-                                CupertinoIcons.bubble_left,
-                                color: Theme.of(context)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 14.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              //? Issue with using the model from the home screen is that it will not update the bookmarks
+                              IconsContainer(
+                                value: post.list[widget.index].bookmark
+                                    .contains(user!.email),
+                                text: post.list[widget.index].bookmark.length
+                                    .toString(),
+                                iconFalse: CupertinoIcons.bookmark,
+                                iconTrue: CupertinoIcons.bookmark_fill,
+                                colorTrue: Theme.of(context)
                                     .colorScheme
                                     .inversePrimary,
+                                onPressed: () {
+                                  post.updatePostBookmark(
+                                    widget.postModel.id,
+                                    widget.index,
+                                  );
+                                },
                               ),
-                            ),
-                            Text(comment.comments.length.toString()),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                post.updatePostLike(
-                                  widget.docID,
-                                  widget.index,
-                                );
-                              },
-                              icon: post.list[widget.index].like
-                                      .contains(user!.email)
-                                  // true
-                                  ? const Icon(
-                                      CupertinoIcons.heart_fill,
-                                      color: Colors.red,
-                                    )
-                                  : Icon(
-                                      CupertinoIcons.heart,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .inversePrimary,
-                                    ),
-                            ),
-                            Text(
-                              post.list[widget.index].like.length.toString(),
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              IconsContainer(
+                                value: false,
+                                iconFalse: CupertinoIcons.repeat,
+                                iconTrue: CupertinoIcons.repeat,
+                                onPressed: () {},
+                                colorTrue: Colors.green,
+                                text: "0",
+                              ),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              IconsContainer(
+                                value: true,
+                                text: comment.comments.length.toString(),
+                                iconFalse: CupertinoIcons.bubble_left,
+                                iconTrue: CupertinoIcons.bubble_left,
+                                colorTrue: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                                onPressed: () {
+                                  comment.addCommentSheet(
+                                    context,
+                                    commentController,
+                                    widget.docID,
+                                    post.list[widget.index].username,
+                                  );
+                                },
+                              ),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              IconsContainer(
+                                value: post.list[widget.index].like
+                                    .contains(user!.email),
+                                text: post.list[widget.index].like.length
+                                    .toString(),
+                                iconFalse: CupertinoIcons.heart,
+                                iconTrue: CupertinoIcons.heart_fill,
+                                colorTrue: Colors.red,
+                                onPressed: () {
+                                  post.updatePostLike(
+                                    widget.docID,
+                                    widget.index,
+                                  );
+                                },
+                              ),
+                              // IconButton(
+                              //   onPressed: () {
+                              //     post.updatePostLike(
+                              //       widget.docID,
+                              //       widget.index,
+                              //     );
+                              //   },
+                              //   icon: post.list[widget.index].like
+                              //           .contains(user!.email)
+                              //       // true
+                              //       ? const Icon(
+                              //           CupertinoIcons.heart_fill,
+                              //           color: Colors.red,
+                              //         )
+                              //       : Icon(
+                              //           CupertinoIcons.heart,
+                              //           color: Theme.of(context)
+                              //               .colorScheme
+                              //               .inversePrimary,
+                              //         ),
+                              // ),
+                              // Text(
+                              //   post.list[widget.index].like.length.toString(),
+                              //   style: const TextStyle(fontSize: 16),
+                              // ),
+                            ],
+                          ),
                         ),
                         const Divider(height: 0),
                         Consumer<CommentsProvider>(

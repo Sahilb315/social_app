@@ -1,3 +1,5 @@
+// ignore_for_file: unrelated_type_equality_checks
+
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -48,6 +50,7 @@ class _UsernamePageState extends State<UsernamePage> {
         password: widget.password,
       );
       await userCredential.user!.updateDisplayName(widget.name);
+      await userCredential.user!.updatePhotoURL("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s");
       await createUserDocument(userCredential);
       if (!context.mounted) return;
       Navigator.pop(context);
@@ -73,7 +76,9 @@ class _UsernamePageState extends State<UsernamePage> {
         'email': userCredential.user!.email,
         'username': usernameController.text,
         'dob': widget.dateOfBirth,
-        'joined': formatDate(Timestamp.now())
+        'joined': formatDate(Timestamp.now()),
+        'profileUrl':
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s"
       });
     }
   }
@@ -166,12 +171,15 @@ class _UsernamePageState extends State<UsernamePage> {
                         await registerUser(context);
                         log("User created");
                         if (!context.mounted) return;
+                        Navigator.popUntil(context, (route) => const ProfilePicturePage(email: "") == route);
                         Navigator.push(
                           context,
                           PageRouteBuilder(
                             pageBuilder:
                                 (context, animation, secondaryAnimation) =>
-                                    const ProfilePicturePage(),
+                                    ProfilePicturePage(
+                              email: widget.email,
+                            ),
                             transitionDuration:
                                 const Duration(milliseconds: 300),
                             transitionsBuilder: (context, animation,
@@ -189,12 +197,6 @@ class _UsernamePageState extends State<UsernamePage> {
                             },
                           ),
                         );
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (_) => const ProfilePicturePage(),
-                        //   ),
-                        // );
                       },
                       style: const ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll(Colors.white),

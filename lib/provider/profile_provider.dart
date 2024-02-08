@@ -10,6 +10,7 @@ class ProfileProvider extends ChangeNotifier {
   List<PostModel> _usersPostList = [];
   List<PostModel> get usersPostList => _usersPostList;
   UserModel _userModel = UserModel(
+    profileUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s",
     dob: "",
     name: "",
     email: "",
@@ -35,12 +36,14 @@ class ProfileProvider extends ChangeNotifier {
     required String bio,
     required String location,
     required String field,
+     String? profileUrl,
   }) async {
     await userFirestore.doc(email).update({
       'bio': bio,
       'name': name,
       'field': field,
       'location': location,
+      'profileUrl': profileUrl
     });
     log("Updated user ${_userModel.toMap().toString()}");
     fetchDetails(email);
