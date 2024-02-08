@@ -9,7 +9,7 @@ class CommentsProvider extends ChangeNotifier {
   List<CommentModel> _comments = [];
   List<CommentModel> get comments => _comments;
   final firestore = FirebaseFirestore.instance.collection("post");
-  final user = FirebaseAuth.instance.currentUser;
+  User? user;
 
   Future<void> fetchComments(
     String docID,
@@ -41,14 +41,18 @@ class CommentsProvider extends ChangeNotifier {
     String docID,
     String username,
   ) {
-    showBottomSheet(
-      backgroundColor: Theme.of(context).colorScheme.background,
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (context) => SizedBox(
-        height: double.infinity,
+        height: MediaQuery.sizeOf(context).height * 1,
         width: double.infinity,
         child: Padding(
-          padding: const EdgeInsets.only(left: 10, right: 5),
+          padding: EdgeInsets.only(
+            left: 10,
+            right: 5,
+            top: MediaQuery.sizeOf(context).height * 0.05,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -133,9 +137,10 @@ class CommentsProvider extends ChangeNotifier {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     backgroundColor: Colors.blue,
                     radius: 26,
+                    foregroundImage: NetworkImage(user!.photoURL.toString()),
                   ),
                   const SizedBox(
                     width: 10,

@@ -1,3 +1,5 @@
+// ignore_for_file: unrelated_type_equality_checks
+
 import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -154,7 +156,12 @@ class _LoginUserPasswordPageState extends State<LoginUserPasswordPage> {
                         await loginUser(context);
                         log("User Logged In");
                         if (!context.mounted) return;
-                        Navigator.pushReplacement(
+                        Navigator.popUntil(
+                            context,
+                            (route) =>
+                                const NavigationPage() == route);
+
+                        Navigator.push(
                           context,
                           PageRouteBuilder(
                             pageBuilder:

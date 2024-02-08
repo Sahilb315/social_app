@@ -16,10 +16,10 @@ class PostsProvider extends ChangeNotifier {
   List<PostModel> _postList = [];
   List<PostModel> get list => _postList;
 
-  set postList(List<PostModel> list) {
-    _postList = list;
-    notifyListeners();
-  }
+  // set postList(List<PostModel> list) {
+  //   _postList = list;
+  //   notifyListeners();
+  // }
 
   PostModel _postModel = PostModel(
     id: "",
@@ -48,8 +48,29 @@ class PostsProvider extends ChangeNotifier {
     }
     fetchPosts();
   }
+  //? This will not work until i pass the model from the list rather then passing the model from the home screen(Like this widget.postModel) bcoz the consumer 
+  //? will not update
+  // Future<void> updateBookmark(
+  //     {required PostModel postModel, int? index}) async {
+  //       log("Update Bookmark ${postModel.toMap().toString()}");
+  //   log("Bookmark  ${postModel.id}");
+  //   if (postModel.bookmark.contains(user!.email)) {
+  //     // if (_postList[index!].bookmark.contains(user!.email)) {
+  //     log("Removing bookmark");
+  //     await firestore.doc(postModel.id).update({
+  //       'bookmark': FieldValue.arrayRemove([user!.email]),
+  //     });
+  //   } else {
+  //     log("Adding bookmark");
+  //     await firestore.doc(postModel.id).update({
+  //       'bookmark': FieldValue.arrayUnion([user!.email]),
+  //     });
+  //   }
+  //   fetchPosts();
+  // }
 
   Future<void> updatePostBookmark(String docID, int index) async {
+    log("Update Post Bookmark ${_postList[index].toMap().toString()}");
     log(docID);
     if (_postList[index].bookmark.contains(user!.email)) {
       log("Remove");
@@ -76,19 +97,8 @@ class PostsProvider extends ChangeNotifier {
     try {
       final snapshot =
           await firestore.orderBy('timestamp', descending: true).get();
-      // _postList = snapshot.docs.map((doc) {
-      //   return PostModel.fromFirestore(doc);
-      // }).toList();
       _postList = snapshot.docs.map((doc) {
-        return PostModel(
-          id: doc.id,
-          username: doc.data()['username'],
-          useremail: doc.data()['useremail'],
-          postmessage: doc.data()['postmessage'],
-          like: doc.data()['like'],
-          timestamp: doc.data()['timestamp'],
-          bookmark: doc.data()['bookmark'],
-        );
+        return PostModel.fromFirestore(doc);
       }).toList();
       change(DataStatus.fetched);
       // log(currentStatus.name);
@@ -98,14 +108,6 @@ class PostsProvider extends ChangeNotifier {
       log(e.toString());
     }
   }
-
-  // Stream getPosts() {
-  //   final snapshot =
-  //       firestore.orderBy('timestamp', descending: true).snapshots();
-  //   List<PostModel> list =
-  //       snapshot.map((event) => PostModel.fromFirestore(event.docs.first)).toList();
-  //   return snapshot;
-  // }
 
   Future<void> addPost(PostModel model) async {
     try {
@@ -209,9 +211,10 @@ class PostsProvider extends ChangeNotifier {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     backgroundColor: Colors.blue,
                     radius: 26,
+                    foregroundImage: NetworkImage(user!.photoURL.toString()),
                   ),
                   const SizedBox(
                     width: 10,

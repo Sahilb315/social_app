@@ -29,7 +29,7 @@ class _NeedAccountPageState extends State<NeedAccountPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.07,
+                  height: MediaQuery.sizeOf(context).height * 0.07,
                 ),
                 const Text(
                   "Need another",

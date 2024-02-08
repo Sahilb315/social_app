@@ -8,11 +8,11 @@ class BookmarkProvider extends ChangeNotifier {
   List<PostModel> get bookmarks => _bookmarks;
 
   final firestore = FirebaseFirestore.instance.collection('post');
-  User? user = FirebaseAuth.instance.currentUser;
+  User? user;
 
   Future<void> fetchUsersBookmarks() async {
     final snap =
-        await firestore.where('bookmark', arrayContains: user!.email).get();
+        await firestore.where('bookmark', arrayContains: "shubh@gmail.com").get();
     _bookmarks = snap.docs.map((doc) => PostModel.fromFirestore(doc)).toList();
     notifyListeners();
   }

@@ -1,5 +1,6 @@
 // ignore_for_file: unrelated_type_equality_checks
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,8 +8,20 @@ import 'package:social_app/components/my_button.dart';
 import 'package:social_app/pages/create_account/need_account_page.dart';
 import 'package:social_app/provider/theme_provider.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  User? user;
+  @override
+  void initState() {
+    user = FirebaseAuth.instance.currentUser!;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +48,10 @@ class SettingsPage extends StatelessWidget {
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
                 if (!context.mounted) return;
-                //? popUntil removes all the routes till the conditions are met and even the NeedAccountPage is removed & then 
-                //? push to the new page 
-                Navigator.popUntil(context, (route) => const NeedAccountPage() == route);
+                //? popUntil removes all the routes till the conditions are met and even the NeedAccountPage is removed & then
+                //? push to the new page
+                Navigator.popUntil(
+                    context, (route) => const NeedAccountPage() == route);
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const NeedAccountPage()));
               },
@@ -66,6 +80,89 @@ class SettingsPage extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            MyButton(
+              text: "Delete Account",
+              onTap: () async => await deleteAccount(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> deleteAccount(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.background,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Are you sure you want to delete your account?"),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                    try {
+                      await user!.delete();
+                      await FirebaseFirestore.instance
+                          .collection('user')
+                          .doc(user!.email)
+                          .delete();
+                      if (!context.mounted) return;
+                      Navigator.pop(context);
+                      Navigator.popUntil(
+                          context, (route) => const NeedAccountPage() == route);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const NeedAccountPage(),
+                        ),
+                      );
+                    } catch (e) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            e.toString(),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text(
+                    "Delete",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

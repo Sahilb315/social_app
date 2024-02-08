@@ -1,6 +1,12 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/provider/profile_provider.dart';
 
@@ -9,10 +15,12 @@ class EditProfilePage extends StatefulWidget {
   final String location;
   final String bio;
   final String field;
+  final String profilePhoto;
 
   const EditProfilePage({
     super.key,
     required this.name,
+    required this.profilePhoto,
     required this.location,
     required this.bio,
     required this.field,
@@ -39,20 +47,83 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.initState();
   }
 
+  // final picker = ImagePicker();
+  File? _imageFile;
+
+  Future<void> getImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _imageFile = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  String? profileUrl;
+
+  Future<void> uploadImage() async {
+    if (_imageFile == null) return;
+
+    // String fileName = _imageFile!.path.split('/').last;
+    String fileName = "profile$email";
+    Reference firebaseStorageRef =
+        FirebaseStorage.instance.ref().child('profile_images/$fileName');
+    var uploadTask = firebaseStorageRef.putFile(_imageFile!);
+    profileUrl = await firebaseStorageRef.getDownloadURL();
+    // print(profileUrl);
+    await FirebaseAuth.instance.currentUser!.updatePhotoURL(profileUrl);
+    await updateProfile();
+    await uploadTask.whenComplete(() => print('Image uploaded'));
+  }
+
+  Future<void> updateProfile() async {
+    if (profileUrl == null) return;
+    await FirebaseFirestore.instance.collection('user').doc(email).update({
+      'profileUrl': profileUrl,
+    });
+    log("Profile Updated");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
           GestureDetector(
-            onTap: () {
+            onTap: () async {
+              showDialog(
+                context: context,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+              await uploadImage();
+              if (!context.mounted) return;
+              // if (profileUrl == null) {
+              //   context.read<ProfileProvider>().editUserProfileDetails(
+              //         email: email,
+              //         name: nameController.text,
+              //         bio: bioController.text,
+              //         location: locationController.text,
+              //         field: fieldController.text,
+              //         profileUrl: widget.profilePhoto,
+              //       );
+              // } else {
               context.read<ProfileProvider>().editUserProfileDetails(
                     email: email,
                     name: nameController.text,
                     bio: bioController.text,
                     location: locationController.text,
                     field: fieldController.text,
+                    profileUrl:
+                        profileUrl != null ? profileUrl! : widget.profilePhoto,
                   );
+              // }
+              Navigator.pop(context);
               Navigator.pop(context);
             },
             child: const Padding(
@@ -73,8 +144,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: Column(
           children: [
             Container(
-              height: MediaQuery.of(context).size.height * 0.2,
+              height: MediaQuery.sizeOf(context).height * 0.2,
               decoration: BoxDecoration(
+                //? Banner Image
                 image: DecorationImage(
                   image: Image.network(
                           "https://imgs.search.brave.com/R3bGwA4un2aVaeeVdn4HdZROk8LSjWjAwpPZVvXHRww/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9tYXJr/ZXRwbGFjZS5jYW52/YS5jb20vRUFEYXBD/X1dtaUkvNC8wLzE2/MDB3L2NhbnZhLXJl/c29ydC1waG90by10/d2l0dGVyLWhlYWRl/ci11OTZzNHVvTFJ1/US5qcGc")
@@ -82,32 +154,38 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   fit: BoxFit.fill,
                 ),
               ),
-              child: const Stack(
+              child: Stack(
                 children: [
                   Positioned.fill(
                     child: Align(
                       alignment: Alignment.bottomLeft,
                       child: Padding(
-                        padding: EdgeInsets.all(7.0),
-                        child: CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.white,
-                          backgroundImage: NetworkImage(
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvi7HpQ-_PMSMOFrj1hwjp6LDcI-jm3Ro0Xw&usqp=CAU",
-                          ),
-                          child: Stack(
-                            children: [
-                              Positioned.fill(
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: Icon(
-                                    CupertinoIcons.camera,
-                                    color: Colors.white,
-                                    size: 40,
+                        padding: const EdgeInsets.all(7.0),
+                        child: GestureDetector(
+                          onTap: () async => await getImage(),
+                          //? Profile Image
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.white,
+                            backgroundImage: _imageFile != null
+                                ? Image.file(_imageFile!).image
+                                : NetworkImage(
+                                    widget.profilePhoto,
+                                  ),
+                            child: const Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Icon(
+                                      CupertinoIcons.camera,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
