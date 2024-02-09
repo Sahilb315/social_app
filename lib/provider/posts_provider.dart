@@ -48,7 +48,7 @@ class PostsProvider extends ChangeNotifier {
     }
     fetchPosts();
   }
-  //? This will not work until i pass the model from the list rather then passing the model from the home screen(Like this widget.postModel) bcoz the consumer 
+  //? This will not work until i pass the model from the list rather then passing the model from the home screen(Like this widget.postModel) bcoz the consumer
   //? will not update
   // Future<void> updateBookmark(
   //     {required PostModel postModel, int? index}) async {
@@ -74,16 +74,21 @@ class PostsProvider extends ChangeNotifier {
     log(docID);
     if (_postList[index].bookmark.contains(user!.email)) {
       log("Remove");
+      _postList[index].bookmark.remove(user!.email);
       await firestore.doc(docID).update({
         'bookmark': FieldValue.arrayRemove([user!.email]),
       });
     } else {
+      _postList[index].bookmark.add(user!.email);
+
       log("Add");
       await firestore.doc(docID).update({
         'bookmark': FieldValue.arrayUnion([user!.email]),
       });
     }
-    fetchPosts();
+    notifyListeners();
+    // fetchPosts();
+    // fetchPostDocumentById(docID);
   }
 
   var currentStatus = DataStatus.initial;

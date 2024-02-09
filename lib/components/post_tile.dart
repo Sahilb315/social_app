@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,6 +42,8 @@ class _PostTileState extends State<PostTile> {
   void initState() {
     user = FirebaseAuth.instance.currentUser;
     timeago.setLocaleMessages('my_en', MyCustomMessages());
+    // Provider.of<PostsProvider>(context, listen: false)
+    //     .fetchPostDocumentById(widget.docID);
     super.initState();
   }
 
@@ -53,6 +57,7 @@ class _PostTileState extends State<PostTile> {
 
   @override
   Widget build(BuildContext context) {
+    log("Post Tile Build ${widget.index}");
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -98,56 +103,55 @@ class _PostTileState extends State<PostTile> {
                   FutureBuilder(
                     future: getProfileUrl(),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        // return const Center(
-                        //   child: CircularProgressIndicator(),
-                        // );
+                      if (snapshot.hasData) {
+                        UserModel userModel =
+                            UserModel.fromFirestore(snapshot.data!);
+
+                        final doc =
+                            snapshot.data!.data() as Map<String, dynamic>;
+                        String data = doc["profileUrl"];
+                        profileUrl = data;
+                        return GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                if (FirebaseAuth.instance.currentUser!.email ==
+                                    widget.postModel.useremail) {
+                                  return const ProfilePage();
+                                }
+                                return PostUserProfile(
+                                  userModel: userModel,
+                                  postModel: widget.postModel,
+                                );
+                              },
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                var begin = const Offset(1.0, 0.0);
+                                var end = Offset.zero;
+                                var curve = Curves.easeIn;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            foregroundImage: NetworkImage(data),
+                          ),
+                        );
+                      } else {
                         return const CircleAvatar(
                           foregroundImage: NetworkImage(
                             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s",
                           ),
                         );
                       }
-                      UserModel userModel =
-                          UserModel.fromFirestore(snapshot.data!);
-
-                      final doc = snapshot.data!.data() as Map;
-                      String data = doc["profileUrl"];
-                      profileUrl = data;
-                      return GestureDetector(
-                        onTap: () => Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) {
-                              if (FirebaseAuth.instance.currentUser!.email ==
-                                  widget.postModel.useremail) {
-                                return const ProfilePage();
-                              }
-                              return PostUserProfile(
-                                userModel: userModel,
-                                postModel: widget.postModel,
-                              );
-                            },
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              var begin = const Offset(1.0, 0.0);
-                              var end = Offset.zero;
-                              var curve = Curves.easeIn;
-
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              return SlideTransition(
-                                position: animation.drive(tween),
-                                child: child,
-                              );
-                            },
-                          ),
-                        ),
-                        child: CircleAvatar(
-                          foregroundImage: NetworkImage(data),
-                        ),
-                      );
                     },
                   ),
                   const SizedBox(
@@ -162,14 +166,14 @@ class _PostTileState extends State<PostTile> {
                           children: [
                             Text(widget.postModel.username.toString()),
                             //* If want to display the users email ↓
-                            // Text(
-                            //   "  ${widget.postModel.useremail.toString()}",
-                            //   style: TextStyle(
-                            //     color: Theme.of(context)
-                            //         .colorScheme
-                            //         .inversePrimary,
-                            //   ),
-                            // ),
+                            Text(
+                              " @${widget.postModel.username.toString()}",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                              ),
+                            ),
                             Text(
                               " ${timeago.format(widget.postModel.timestamp.toDate(), locale: 'en_short')}",
                               style: TextStyle(
@@ -189,6 +193,7 @@ class _PostTileState extends State<PostTile> {
                         Consumer2<PostsProvider, CommentsProvider>(
                           builder:
                               (context, postProvider, commentProvider, child) {
+                            log("Consumer Rebuild ${widget.index}");
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
@@ -198,18 +203,19 @@ class _PostTileState extends State<PostTile> {
                                 children: [
                                   //?   BOOKMARK
                                   IconsContainer(
-                                    value: widget.postModel.bookmark
+                                    value: postProvider
+                                        .list[widget.index].bookmark
                                         .contains(user!.email),
-                                    text: widget.postModel.bookmark.length
+                                    text: postProvider
+                                        .list[widget.index].bookmark.length
                                         .toString(),
                                     iconFalse: CupertinoIcons.bookmark,
                                     iconTrue: CupertinoIcons.bookmark_fill,
-                                    colorTrue:
-                                        Theme.of(context).colorScheme.secondary,
+                                    colorTrue: Colors.blue,
                                     onPressed: () {
                                       postProvider.updatePostBookmark(
                                         widget.postModel.id,
-                                        widget.index
+                                        widget.index,
                                       );
                                     },
                                   ),
