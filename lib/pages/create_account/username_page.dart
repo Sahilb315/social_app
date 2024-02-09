@@ -50,7 +50,9 @@ class _UsernamePageState extends State<UsernamePage> {
         password: widget.password,
       );
       await userCredential.user!.updateDisplayName(widget.name);
-      await userCredential.user!.updatePhotoURL("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s");
+      await userCredential.user!.updatePhotoURL(
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s",
+      );
       await createUserDocument(userCredential);
       if (!context.mounted) return;
       Navigator.pop(context);
@@ -171,7 +173,10 @@ class _UsernamePageState extends State<UsernamePage> {
                         await registerUser(context);
                         log("User created");
                         if (!context.mounted) return;
-                        Navigator.popUntil(context, (route) => const ProfilePicturePage(email: "") == route);
+                        Navigator.popUntil(
+                            context,
+                            (route) =>
+                                const ProfilePicturePage(email: "") == route);
                         Navigator.push(
                           context,
                           PageRouteBuilder(

@@ -120,31 +120,35 @@ class _ProfilePicturePageState extends State<ProfilePicturePage> {
                         border: Border.all(color: Colors.blue, width: 2),
                         borderRadius: BorderRadius.circular(8),
                         image: DecorationImage(
-                          image:
-                          //  _imageFile != null
-                          //     ? Image.file(_imageFile!).image
-                          //     : 
-                              Image.asset("assets/icon.png").image,
+                          image: _imageFile != null
+                              ? Image.file(_imageFile!).image
+                              : Image.asset(
+                                  "assets/blank.png",
+                                  color: Colors.transparent,
+                                  scale: 1,
+                                ).image,
                         ),
                       ),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            CupertinoIcons.photo_camera,
-                            color: Colors.blue,
-                            size: 100,
-                          ),
-                          Text(
-                            "Upload",
-                            style: TextStyle(
-                              fontSize: 24,
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
+                      child: _imageFile != null
+                          ? Container()
+                          : const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  CupertinoIcons.photo_camera,
+                                  color: Colors.blue,
+                                  size: 100,
+                                ),
+                                Text(
+                                  "Upload",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 ),

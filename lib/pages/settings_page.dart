@@ -94,6 +94,29 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Future<void> deleteUserInfo() async {
+    final posts = await FirebaseFirestore.instance
+        .collection("post")
+        .where('useremail', isEqualTo: user!.email)
+        .get();
+    for (QueryDocumentSnapshot doc in posts.docs) {
+      await doc.reference.delete();
+    }
+    final comments = await FirebaseFirestore.instance.collection('post').get();
+    for (var element in comments.docs) {
+      final commentsQuerySnapshot = await FirebaseFirestore.instance
+          .collection('post')
+          .doc(element.id)
+          .collection('comments')
+          .where('commentedBy', isEqualTo: user!.email)
+          .get();
+
+      for (var commentDoc in commentsQuerySnapshot.docs) {
+        await commentDoc.reference.delete();
+      }
+    }
+  }
+
   Future<void> deleteAccount(BuildContext context) async {
     showDialog(
       context: context,
@@ -123,6 +146,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           .collection('user')
                           .doc(user!.email)
                           .delete();
+                      await deleteUserInfo();
                       if (!context.mounted) return;
                       Navigator.pop(context);
                       Navigator.popUntil(
