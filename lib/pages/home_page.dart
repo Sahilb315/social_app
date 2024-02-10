@@ -55,7 +55,6 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(12.0),
               child: CircleAvatar(
                 foregroundImage: NetworkImage(user!.photoURL.toString()),
-                // foregroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s"),
               ),
             ),
           ),
@@ -97,26 +96,6 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                   ),
-                  // Consumer<PostsProvider>(
-                  //   builder: (context, value, child) {
-                  //     final postList = value.list;
-                  //     return Center(
-                  //       child: ListView(
-                  //         children: List.generate(
-                  //           value.list.length,
-                  //           (index) {
-                  //             return PostTile(
-                  //               docID: postList[index].id,
-                  //               index: index,
-                  //               postModel: postList[index],
-                  //               date: postList[index].timestamp.toString(),
-                  //             );
-                  //           },
-                  //         ),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
                   Positioned(
                     bottom: 20,
                     right: 15,

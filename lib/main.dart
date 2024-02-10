@@ -5,13 +5,16 @@ import 'package:social_app/pages/home_page.dart';
 import 'package:social_app/pages/bookmark_page.dart';
 import 'package:social_app/pages/profile_page.dart';
 import 'package:social_app/pages/settings_page.dart';
-import 'package:social_app/pages/chat_page.dart';
+import 'package:social_app/pages/users_page.dart';
 import 'package:social_app/provider/bookmarks_provider.dart';
+import 'package:social_app/provider/chat_provider.dart';
 import 'package:social_app/provider/comments_povider.dart';
+import 'package:social_app/provider/latest_message_provider.dart';
 import 'package:social_app/provider/login_register_provider.dart';
 import 'package:social_app/provider/navigation_provider.dart';
 import 'package:social_app/provider/posts_provider.dart';
 import 'package:social_app/provider/profile_provider.dart';
+import 'package:social_app/provider/user_provider.dart';
 import 'package:social_app/utils/routes/myroutes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:social_app/provider/theme_provider.dart';
@@ -32,6 +35,9 @@ void main() async {
         ChangeNotifierProvider(create: (context) => BookmarkProvider()),
         ChangeNotifierProvider(create: (context) => LoginRegisterProvider()),
         ChangeNotifierProvider(create: (context) => NavigationProvider()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => ChatProvider()),
+        ChangeNotifierProvider(create: (context) => LatestMessageProvider()),
       ],
       child: const MyApp(),
     ),
@@ -52,7 +58,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           routes: {
             MyRoutes.homePage: (context) => const HomePage(),
-            MyRoutes.usersPage: (context) => const ChatPage(),
+            MyRoutes.usersPage: (context) => const UsersPage(),
             MyRoutes.profilePage: (context) => const ProfilePage(),
             MyRoutes.bookmarkPage: (context) => const BookmarkPage(),
             MyRoutes.settingsPage: (context) => const SettingsPage(),
