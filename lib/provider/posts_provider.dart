@@ -46,6 +46,7 @@ class PostsProvider extends ChangeNotifier {
         'like': FieldValue.arrayUnion([user!.email]),
       });
     }
+
     fetchPosts();
   }
   //? This will not work until i pass the model from the list rather then passing the model from the home screen(Like this widget.postModel) bcoz the consumer

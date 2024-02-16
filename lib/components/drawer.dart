@@ -51,13 +51,9 @@ class _MyDrawerState extends State<MyDrawer> {
                 child: UserAccountsDrawerHeader(
                   currentAccountPicture: ClipRRect(
                     borderRadius: BorderRadius.circular(40),
-                    child: 
-                    Image.network(
+                    child: Image.network(
                       FirebaseAuth.instance.currentUser!.photoURL.toString(),
                     ),
-                    // Image.network(
-                    //  ("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s"),
-                    // ),
                   ),
                   accountName: Text(
                     FirebaseAuth.instance.currentUser!.displayName.toString(),

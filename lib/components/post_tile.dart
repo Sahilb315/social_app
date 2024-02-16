@@ -47,7 +47,7 @@ class _PostTileState extends State<PostTile> {
     super.initState();
   }
 
-  Future<DocumentSnapshot> getProfileUrl() async {
+  Future<DocumentSnapshot> getProfile() async {
     final userCollection = FirebaseFirestore.instance.collection("user");
     final doc = await userCollection.doc(widget.postModel.useremail).get();
     return doc;
@@ -90,18 +90,22 @@ class _PostTileState extends State<PostTile> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            widget.index == 0
-                ? const Divider(
-                    thickness: 0.4,
-                  )
-                : const SizedBox.shrink(),
+            // widget.index == 0
+            //     ? const Divider(
+            //         color: Colors.grey,
+            //         thickness: 0.2,
+            //       )
+            //     : const SizedBox.shrink(),
+            SizedBox(
+              height: MediaQuery.sizeOf(context).height * 0.02,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   FutureBuilder(
-                    future: getProfileUrl(),
+                    future: getProfile(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         UserModel userModel =
@@ -164,22 +168,35 @@ class _PostTileState extends State<PostTile> {
                       children: [
                         Row(
                           children: [
-                            Text(widget.postModel.username.toString()),
-                            //* If want to display the users email ↓
                             Text(
-                              " @${widget.postModel.username.toString()}",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
+                              widget.postModel.username.toString(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
+                            FutureBuilder(
+                              future: getProfile(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final doc = snapshot.data!.data()
+                                      as Map<String, dynamic>;
+                                  String data = doc["username"];
+                                  return Text(
+                                    " @$data",
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                    ),
+                                  );
+                                }
+                                return const Text("");
+                              },
                             ),
                             Text(
                               " ${timeago.format(widget.postModel.timestamp.toDate(), locale: 'en_short')}",
                               style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
+                                color: Theme.of(context).colorScheme.secondary,
                               ),
                             ),
                           ],
@@ -276,7 +293,8 @@ class _PostTileState extends State<PostTile> {
               ),
             ),
             const Divider(
-              thickness: 0.4,
+              color: Colors.grey,
+              thickness: 0.3,
             )
           ],
         ),

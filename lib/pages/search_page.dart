@@ -1,7 +1,12 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social_app/components/drawer.dart';
+import 'package:social_app/models/user_model.dart';
 import 'package:social_app/pages/search_tab_pages/for_you_tab_page.dart';
+import 'package:social_app/provider/search_provider.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -46,69 +51,58 @@ class _SearchPageState extends State<SearchPage>
             child: Icon(Icons.settings),
           ),
         ],
-        title: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey.shade800,
-            borderRadius: BorderRadius.circular(32),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  right: 24.0,
-                  top: 10.0,
-                  bottom: 10.0,
-                  left: 10,
-                ),
-                child: Text(
-                  "Seach X",
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: Colors.grey.shade300,
-                    fontSize: 16,
+        title: GestureDetector(
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const SearchingPage())),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: BorderRadius.circular(32),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    right: 24.0,
+                    top: 10.0,
+                    bottom: 10.0,
+                    left: 10,
+                  ),
+                  child: Text(
+                    "Seach X",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Colors.grey.shade300,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-        // centerTitle: true,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 40,
-            child: TabBar(
-              isScrollable: true,
-              unselectedLabelColor: Colors.grey,
-              labelColor: Colors.white,
-              indicatorColor: Colors.blue,
-              indicatorPadding: EdgeInsets.zero,
-              padding: EdgeInsets.zero,
-              tabs: const [
-                Tab(
-                  icon: Text("For you"),
-                ),
-                Tab(
-                  icon: Text("Trending"),
-                ),
-                Tab(
-                  icon: Text("News"),
-                ),
-                Tab(
-                  icon: Text("Sports"),
-                ),
-                Tab(
-                    icon: Text(
-                  "Entertainment",
-                )),
-              ],
-              controller: tabController,
-              indicatorSize: TabBarIndicatorSize.tab,
-            ),
+          TabBar(
+            isScrollable: true,
+            unselectedLabelColor: Colors.grey,
+            labelColor: Colors.white,
+            indicatorColor: Colors.blue,
+            indicatorPadding: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
+            tabs: const [
+              Tab(icon: Text("For you")),
+              Tab(icon: Text("Trending")),
+              Tab(icon: Text("News")),
+              Tab(icon: Text("Sports")),
+              Tab(icon: Text("Entertainment")),
+            ],
+            controller: tabController,
+            indicatorSize: TabBarIndicatorSize.tab,
           ),
           Expanded(
             child: TabBarView(
@@ -120,6 +114,116 @@ class _SearchPageState extends State<SearchPage>
                 Icon(Icons.car_crash_outlined),
                 Icon(Icons.mobile_friendly),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SearchingPage extends StatefulWidget {
+  const SearchingPage({super.key});
+
+  @override
+  State<SearchingPage> createState() => _SearchingPageState();
+}
+
+class _SearchingPageState extends State<SearchingPage> {
+  final searchController = TextEditingController();
+  @override
+  void initState() {
+    Provider.of<SearchProvider>(context, listen: false).getAllUsers();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<SearchProvider>(
+      builder: (context, provider, child) => Scaffold(
+        appBar: AppBar(
+          title: TextFormField(
+            autofocus: true,
+            controller: searchController,
+            decoration: const InputDecoration(
+              hintText: "Search X",
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+            ),
+            onChanged: (value) {
+              if (value.isEmpty) {
+                provider.clearList();
+              }
+              for (var i = 0; i < provider.users.length; i++) {
+                if (provider.users[i].name
+                        .toLowerCase()
+                        .contains(value.toLowerCase()) ||
+                    provider.users[i].username
+                        .toLowerCase()
+                        .contains(value.toString())) {
+                  if (provider.searchedUsers.contains(provider.users[i])) {
+                    return;
+                  }
+                  provider.addUser(provider.users[i]);
+                }
+              }
+            },
+          ),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: provider.searchedUsers.length,
+                itemBuilder: (context, index) {
+                  final users = provider.searchedUsers;
+                  if (users.isEmpty) {
+                    return const Text("No users were found");
+                  }
+                  log(index.toString());
+                  final singleUser = provider.searchedUsers[index];
+                  return ListTile(
+                    leading: CircleAvatar(),
+                    title: Text(singleUser.name),
+                    subtitle: Text("data"),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RecentUsers extends StatelessWidget {
+  const RecentUsers({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.only(left: 18.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 24,
+          ),
+          Text(
+            "data",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          Text(
+            "data",
+            style: TextStyle(
+              fontSize: 13,
             ),
           ),
         ],
