@@ -1,4 +1,8 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:social_app/pages/create_account/create_acc_page.dart';
 import 'package:social_app/pages/login_user/login_user_page.dart';
 
@@ -20,7 +24,7 @@ class _NeedAccountPageState extends State<NeedAccountPage> {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(18.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,16 +58,15 @@ class _NeedAccountPageState extends State<NeedAccountPage> {
                   "Whether you need another account for work or just don't want your mum seeing your takes, we've got you covered that.",
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
-                // SizedBox(
-                //   height: MediaQuery.sizeOf(context).height * 0.23,
-                // ),
               ],
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await signInWithGoogle();
+                  },
                   style: const ButtonStyle(
                     backgroundColor: MaterialStatePropertyAll(Colors.white),
                   ),
@@ -222,4 +225,35 @@ class _NeedAccountPageState extends State<NeedAccountPage> {
       ),
     );
   }
+
+  Future<UserCredential> signInWithGoogle() async {
+    final GoogleSignInAccount? signInUser = await GoogleSignIn().signIn();
+
+    final GoogleSignInAuthentication? signInAuthentication =
+        await signInUser?.authentication;
+    final credential = GoogleAuthProvider.credential(
+      accessToken: signInAuthentication?.accessToken,
+      idToken: signInAuthentication?.idToken,
+    );
+
+    log("${signInUser!.email}  ${signInUser.displayName}  ${signInUser.photoUrl}");
+    return FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+    // Future<void> createUserDocument(UserCredential? userCredential) async {
+    // if (userCredential != null && userCredential.user != null) {
+    //   await FirebaseFirestore.instance
+    //       .collection('user')
+    //       .doc(userCredential.user!.email)
+    //       .set({
+    //     'name': widget.name,
+    //     'email': userCredential.user!.email,
+    //     'username': usernameController.text,
+    //     'dob': widget.dateOfBirth,
+    //     'joined': formatDate(Timestamp.now()),
+    //     'profileUrl':
+    //         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s"
+    //   });
+    // }
+  // }
 }

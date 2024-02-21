@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -51,9 +50,14 @@ class _ProfilePicturePageState extends State<ProfilePicturePage> {
 
   late String profileUrl;
 
-  Future<void> uploadImage() async {
+  Future<void> uploadImage(BuildContext context) async {
     if (_imageFile == null) return;
-
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
     String fileName = "profile$userEmail";
     Reference firebaseStorageRef =
         FirebaseStorage.instance.ref().child('profile_images/$fileName');
@@ -63,10 +67,10 @@ class _ProfilePicturePageState extends State<ProfilePicturePage> {
       profileUrl = await firebaseStorageRef.getDownloadURL();
       return;
     });
-    log(profileUrl);
     await FirebaseAuth.instance.currentUser!.updatePhotoURL(profileUrl);
     await updateProfilePic(profileUrl);
-    // await uploadTask.whenComplete(() => print('Image uploaded'));
+    if (!context.mounted) return;
+    Navigator.of(context).pop();
   }
 
   @override
@@ -207,7 +211,7 @@ class _ProfilePicturePageState extends State<ProfilePicturePage> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        await uploadImage();
+                        await uploadImage(context);
                         if (!context.mounted) return;
                         Navigator.pushReplacement(
                           context,
