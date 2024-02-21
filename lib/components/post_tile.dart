@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -47,7 +46,7 @@ class _PostTileState extends State<PostTile> {
     super.initState();
   }
 
-  Future<DocumentSnapshot> getProfileUrl() async {
+  Future<DocumentSnapshot> getProfile() async {
     final userCollection = FirebaseFirestore.instance.collection("user");
     final doc = await userCollection.doc(widget.postModel.useremail).get();
     return doc;
@@ -57,7 +56,6 @@ class _PostTileState extends State<PostTile> {
 
   @override
   Widget build(BuildContext context) {
-    log("Post Tile Build ${widget.index}");
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -90,18 +88,16 @@ class _PostTileState extends State<PostTile> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            widget.index == 0
-                ? const Divider(
-                    thickness: 0.4,
-                  )
-                : const SizedBox.shrink(),
+            SizedBox(
+              height: MediaQuery.sizeOf(context).height * 0.02,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   FutureBuilder(
-                    future: getProfileUrl(),
+                    future: getProfile(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         UserModel userModel =
@@ -123,7 +119,7 @@ class _PostTileState extends State<PostTile> {
                                 }
                                 return PostUserProfile(
                                   userModel: userModel,
-                                  postModel: widget.postModel,
+                                  // postModel: widget.postModel,
                                 );
                               },
                               transitionsBuilder: (context, animation,
@@ -164,22 +160,35 @@ class _PostTileState extends State<PostTile> {
                       children: [
                         Row(
                           children: [
-                            Text(widget.postModel.username.toString()),
-                            //* If want to display the users email ↓
                             Text(
-                              " @${widget.postModel.username.toString()}",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
+                              widget.postModel.username.toString(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
+                            FutureBuilder(
+                              future: getProfile(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final doc = snapshot.data!.data()
+                                      as Map<String, dynamic>;
+                                  String data = doc["username"];
+                                  return Text(
+                                    " @$data",
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                    ),
+                                  );
+                                }
+                                return const Text("");
+                              },
                             ),
                             Text(
                               " ${timeago.format(widget.postModel.timestamp.toDate(), locale: 'en_short')}",
                               style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
+                                color: Theme.of(context).colorScheme.secondary,
                               ),
                             ),
                           ],
@@ -193,78 +202,81 @@ class _PostTileState extends State<PostTile> {
                         Consumer2<PostsProvider, CommentsProvider>(
                           builder:
                               (context, postProvider, commentProvider, child) {
-                            log("Consumer Rebuild ${widget.index}");
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  //?   BOOKMARK
-                                  IconsContainer(
-                                    value: postProvider
-                                        .list[widget.index].bookmark
-                                        .contains(user!.email),
-                                    text: postProvider
-                                        .list[widget.index].bookmark.length
-                                        .toString(),
-                                    iconFalse: CupertinoIcons.bookmark,
-                                    iconTrue: CupertinoIcons.bookmark_fill,
-                                    colorTrue: Colors.blue,
-                                    onPressed: () {
-                                      postProvider.updatePostBookmark(
-                                        widget.postModel.id,
-                                        widget.index,
-                                      );
-                                    },
-                                  ),
-                                  //?   RETWEET
-                                  IconsContainer(
-                                    value: false,
-                                    iconFalse: CupertinoIcons.repeat,
-                                    iconTrue: CupertinoIcons.repeat,
-                                    onPressed: () {},
-                                    colorTrue: Colors.green,
-                                  ),
-                                  //?   COMMENT
-                                  IconsContainer(
-                                    value: true,
-                                    iconFalse: CupertinoIcons.bubble_left,
-                                    iconTrue: CupertinoIcons.bubble_left,
-                                    colorTrue: Theme.of(context)
-                                        .colorScheme
-                                        .inversePrimary,
-                                    onPressed: () {
-                                      commentProvider.addCommentSheet(
-                                        context,
-                                        commentController,
-                                        widget.docID,
-                                        postProvider
-                                            .list[widget.index].username,
-                                      );
-                                    },
-                                  ),
-                                  //?   LIKE
-                                  IconsContainer(
-                                    value: postProvider.list[widget.index].like
-                                        .contains(user!.email),
-                                    text: postProvider
-                                        .list[widget.index].like.length
-                                        .toString(),
-                                    iconFalse: CupertinoIcons.heart,
-                                    iconTrue: CupertinoIcons.heart_fill,
-                                    colorTrue: Colors.red,
-                                    onPressed: () {
-                                      postProvider.updatePostLike(
-                                        widget.docID,
-                                        widget.index,
-                                      );
-                                    },
-                                  ),
-                                  // To arrange the icons
-                                  const SizedBox()
-                                ],
+                              child: SizedBox(
+                                height: 25,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    //?   BOOKMARK
+                                    IconsContainer(
+                                      value: postProvider
+                                          .list[widget.index].bookmark
+                                          .contains(user!.email),
+                                      text: postProvider
+                                          .list[widget.index].bookmark.length
+                                          .toString(),
+                                      iconFalse: CupertinoIcons.bookmark,
+                                      iconTrue: CupertinoIcons.bookmark_fill,
+                                      colorTrue: Colors.blue,
+                                      onPressed: () {
+                                        postProvider.updatePostBookmark(
+                                          widget.postModel.id,
+                                          widget.index,
+                                        );
+                                      },
+                                    ),
+                                    //?   RETWEET
+                                    IconsContainer(
+                                      value: false,
+                                      iconFalse: CupertinoIcons.repeat,
+                                      iconTrue: CupertinoIcons.repeat,
+                                      onPressed: () {},
+                                      colorTrue: Colors.green,
+                                    ),
+                                    //?   COMMENT
+                                    IconsContainer(
+                                      value: true,
+                                      iconFalse: CupertinoIcons.bubble_left,
+                                      iconTrue: CupertinoIcons.bubble_left,
+                                      colorTrue: Theme.of(context)
+                                          .colorScheme
+                                          .inversePrimary,
+                                      onPressed: () {
+                                        commentProvider.addCommentSheet(
+                                          context,
+                                          commentController,
+                                          widget.docID,
+                                          postProvider
+                                              .list[widget.index].username,
+                                        );
+                                      },
+                                    ),
+                                    //?   LIKE
+                                    IconsContainer(
+                                      value: postProvider
+                                          .list[widget.index].like
+                                          .contains(user!.email),
+                                      text: postProvider
+                                          .list[widget.index].like.length
+                                          .toString(),
+                                      iconFalse: CupertinoIcons.heart,
+                                      iconTrue: CupertinoIcons.heart_fill,
+                                      colorTrue: Colors.red,
+                                      onPressed: () {
+                                        postProvider.updatePostLike(
+                                          widget.docID,
+                                          widget.index,
+                                        );
+                                      },
+                                    ),
+                                    // To arrange the icons
+                                    const SizedBox()
+                                  ],
+                                ),
                               ),
                             );
                           },
@@ -276,7 +288,8 @@ class _PostTileState extends State<PostTile> {
               ),
             ),
             const Divider(
-              thickness: 0.4,
+              color: Colors.grey,
+              thickness: 0.3,
             )
           ],
         ),

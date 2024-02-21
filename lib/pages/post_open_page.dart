@@ -130,7 +130,8 @@ class PostOpenPageState extends State<PostOpenPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              //? Issue with using the model from the home screen is that it will not update the bookmarks
+                              //* Issue with using the model from the home screen is that it will not update the bookmarks
+                              //? Bookmark
                               IconsContainer(
                                 value: post.list[widget.index].bookmark
                                     .contains(user!.email),
@@ -138,9 +139,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                                     .toString(),
                                 iconFalse: CupertinoIcons.bookmark,
                                 iconTrue: CupertinoIcons.bookmark_fill,
-                                colorTrue: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
+                                colorTrue: Colors.blue,
                                 onPressed: () {
                                   post.updatePostBookmark(
                                     widget.postModel.id,
@@ -151,6 +150,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                               const SizedBox(
                                 width: 15,
                               ),
+                              //? Repost
                               IconsContainer(
                                 value: false,
                                 iconFalse: CupertinoIcons.repeat,
@@ -162,6 +162,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                               const SizedBox(
                                 width: 15,
                               ),
+                              //? Comment
                               IconsContainer(
                                 value: true,
                                 text: comment.comments.length.toString(),
@@ -182,6 +183,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                               const SizedBox(
                                 width: 15,
                               ),
+                              //? Like
                               IconsContainer(
                                 value: post.list[widget.index].like
                                     .contains(user!.email),

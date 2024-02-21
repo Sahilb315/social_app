@@ -17,26 +17,29 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
-  final user = FirebaseAuth.instance.currentUser!;
+  User? user;
   @override
   void initState() {
+    user = FirebaseAuth.instance.currentUser!;
     Provider.of<ProfileProvider>(context, listen: false)
-        .fetchDetails(user.email);
+        .fetchDetails(user!.email);
     Provider.of<ProfileProvider>(context, listen: false)
-        .fetchPostsByUser(user.email);
+        .getCurrentUsersModel(user!.email.toString());
     Provider.of<ProfileProvider>(context, listen: false)
-        .fetchRepliesByUser(user.email);
+        .fetchPostsByUser(user!.email);
+    Provider.of<ProfileProvider>(context, listen: false)
+        .fetchRepliesByUser(user!.email);
     tabController = TabController(length: 2, vsync: this);
     super.initState();
   }
 
   Future<void> _refresh() async {
     Provider.of<ProfileProvider>(context, listen: false)
-        .fetchDetails(user.email);
+        .fetchDetails(user!.email);
     Provider.of<ProfileProvider>(context, listen: false)
-        .fetchPostsByUser(user.email);
+        .fetchPostsByUser(user!.email);
     Provider.of<ProfileProvider>(context, listen: false)
-        .fetchRepliesByUser(user.email);
+        .fetchRepliesByUser(user!.email);
   }
 
   @override
@@ -120,7 +123,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 pageBuilder:
                                     (context, animation, secondaryAnimation) =>
                                         EditProfilePage(
-                                          profilePhoto: profile.profileUrl,
+                                  profilePhoto: profile.profileUrl,
                                   name: profile.name,
                                   location: profile.location,
                                   bio: profile.bio,
@@ -249,7 +252,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 fontWeight: FontWeight.bold,
                                 fontSize: 17,
                               ),
-                              text: profile.following.toString(),
+                              text: profile.following.length.toString(),
                               children: const [
                                 TextSpan(
                                   text: " Following",
@@ -274,7 +277,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 fontWeight: FontWeight.bold,
                                 fontSize: 17,
                               ),
-                              text: profile.followers.toString(),
+                              text: profile.followers.length.toString(),
                               children: const [
                                 TextSpan(
                                   text: " Followers",

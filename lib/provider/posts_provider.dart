@@ -36,17 +36,18 @@ class PostsProvider extends ChangeNotifier {
   final firestore = FirebaseFirestore.instance.collection("post");
 
   Future<void> updatePostLike(String docID, int index) async {
-    // log(docID);
     if (_postList[index].like.contains(user!.email)) {
+      _postList[index].like.remove(user!.email);
       await firestore.doc(docID).update({
         'like': FieldValue.arrayRemove([user!.email]),
       });
     } else {
+      _postList[index].like.add(user!.email);
       await firestore.doc(docID).update({
         'like': FieldValue.arrayUnion([user!.email]),
       });
     }
-    fetchPosts();
+    notifyListeners();
   }
   //? This will not work until i pass the model from the list rather then passing the model from the home screen(Like this widget.postModel) bcoz the consumer
   //? will not update
@@ -70,8 +71,6 @@ class PostsProvider extends ChangeNotifier {
   // }
 
   Future<void> updatePostBookmark(String docID, int index) async {
-    log("Update Post Bookmark ${_postList[index].toMap().toString()}");
-    log(docID);
     if (_postList[index].bookmark.contains(user!.email)) {
       log("Remove");
       _postList[index].bookmark.remove(user!.email);
@@ -87,8 +86,6 @@ class PostsProvider extends ChangeNotifier {
       });
     }
     notifyListeners();
-    // fetchPosts();
-    // fetchPostDocumentById(docID);
   }
 
   var currentStatus = DataStatus.initial;

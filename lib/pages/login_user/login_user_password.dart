@@ -18,7 +18,7 @@ class LoginUserPasswordPage extends StatefulWidget {
 class _LoginUserPasswordPageState extends State<LoginUserPasswordPage> {
   final passwordController = TextEditingController();
 
-  Future<void> loginUser(BuildContext context) async {
+  Future<bool> loginUser(BuildContext context) async {
     showDialog(
       context: context,
       builder: (context) => const Center(child: CircularProgressIndicator()),
@@ -31,7 +31,7 @@ class _LoginUserPasswordPageState extends State<LoginUserPasswordPage> {
           content: Text("Please enter your password"),
         ),
       );
-      return;
+      return false;
     }
 
     try {
@@ -39,16 +39,18 @@ class _LoginUserPasswordPageState extends State<LoginUserPasswordPage> {
         email: widget.email,
         password: passwordController.text,
       );
-      if (!context.mounted) return;
+      if (!context.mounted) return true;
       Navigator.pop(context);
+      return true;
     } catch (e) {
-      if (!context.mounted) return;
+      if (!context.mounted) return false;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString()),
         ),
       );
+      return false;
     }
   }
 
@@ -153,35 +155,68 @@ class _LoginUserPasswordPageState extends State<LoginUserPasswordPage> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        await loginUser(context);
-                        log("User Logged In");
-                        if (!context.mounted) return;
-                        Navigator.popUntil(
+                        if (await loginUser(context) == true) {
+                          if (!context.mounted) return;
+                          Navigator.popUntil(
                             context,
-                            (route) =>
-                                const NavigationPage() == route);
+                            (route) => const NavigationPage() == route,
+                          );
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const NavigationPage(),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                var begin = const Offset(1.0, 0.0);
+                                var end = Offset.zero;
+                                var curve = Curves.easeIn;
 
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    const NavigationPage(),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              var begin = const Offset(1.0, 0.0);
-                              var end = Offset.zero;
-                              var curve = Curves.easeIn;
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                          log("User Logged In");
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Invalid"),
+                            ),
+                          );
+                        }
+                        // await loginUser(context);
+                        // if (!context.mounted) return;
+                        // Navigator.popUntil(
+                        //   context,
+                        //   (route) => const NavigationPage() == route,
+                        // );
+                        // Navigator.push(
+                        //   context,
+                        //   PageRouteBuilder(
+                        //     pageBuilder:
+                        //         (context, animation, secondaryAnimation) =>
+                        //             const NavigationPage(),
+                        //     transitionsBuilder: (context, animation,
+                        //         secondaryAnimation, child) {
+                        //       var begin = const Offset(1.0, 0.0);
+                        //       var end = Offset.zero;
+                        //       var curve = Curves.easeIn;
 
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              return SlideTransition(
-                                position: animation.drive(tween),
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
+                        //       var tween = Tween(begin: begin, end: end)
+                        //           .chain(CurveTween(curve: curve));
+                        //       return SlideTransition(
+                        //         position: animation.drive(tween),
+                        //         child: child,
+                        //       );
+                        //     },
+                        //   ),
+                        // );
                       },
                       style: const ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll(Colors.white),

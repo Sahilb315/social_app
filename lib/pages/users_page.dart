@@ -61,7 +61,7 @@ class _UsersPageState extends State<UsersPage> {
         ],
         title: Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade800,
+            color: Theme.of(context).colorScheme.primary,
             borderRadius: BorderRadius.circular(32),
           ),
           child: Row(
@@ -74,7 +74,7 @@ class _UsersPageState extends State<UsersPage> {
                   "Seach Direct Messages",
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                    color: Colors.grey.shade300,
+                    color: Theme.of(context).colorScheme.inversePrimary,
                     fontSize: 16,
                   ),
                 ),
@@ -123,6 +123,8 @@ class _UsersPageState extends State<UsersPage> {
                           ),
                         ),
                         leading: CircleAvatar(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.background,
                           radius: 32,
                           foregroundImage: NetworkImage(
                             userList[index].profileUrl.toString(),
@@ -135,6 +137,9 @@ class _UsersPageState extends State<UsersPage> {
                               message[index]?.isNotEmpty ?? false
                                   ? message[index].toString()
                                   : "",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
                             );
                           },
                         ),
@@ -151,7 +156,8 @@ class _UsersPageState extends State<UsersPage> {
                                 text: " @${userList[index].username}",
                                 style: TextStyle(
                                   fontSize: 15,
-                                  color: Theme.of(context).colorScheme.primary,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                 ),
                               ),
                             ],
