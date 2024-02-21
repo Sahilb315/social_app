@@ -150,17 +150,6 @@ class _EnterPasswordPageState extends State<EnterPasswordPage> {
                             },
                           ),
                         );
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (_) => UsernamePage(
-                        //       name: widget.name,
-                        //       email: widget.email,
-                        //       dateOfBirth: widget.dateOfBirth,
-                        //       password: passwordController.text,
-                        //     ),
-                        //   ),
-                        // );
                       },
                       style: const ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll(Colors.white),
