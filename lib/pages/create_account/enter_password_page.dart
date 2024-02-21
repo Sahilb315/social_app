@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social_app/pages/create_account/username_page.dart';
+import 'package:social_app/provider/show_password.dart';
 
 class EnterPasswordPage extends StatefulWidget {
   final String name;
@@ -58,42 +60,47 @@ class _EnterPasswordPageState extends State<EnterPasswordPage> {
                 const SizedBox(
                   height: 15,
                 ),
-                TextField(
-                  controller: passwordController,
-                  cursorColor: Colors.blue,
-                  cursorRadius: const Radius.circular(12),
-                  obscureText: true,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        width: 2,
+                Consumer<ShowPasswordProvider>(
+                  builder: (context, value, child) => TextField(
+                    controller: passwordController,
+                    cursorColor: Colors.blue,
+                    cursorRadius: const Radius.circular(12),
+                    obscureText: value.showPasswordRegister,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          width: 2,
+                          color: Colors.grey,
+                        ),
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          width: 2,
+                          color: Colors.blue,
+                        ),
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.blue,
+                        ),
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          value.togglePasswordRegister();
+                        },
+                        icon: const Icon(CupertinoIcons.eye),
                         color: Colors.grey,
                       ),
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        width: 2,
-                        color: Colors.blue,
+                      labelText: "Password",
+                      labelStyle: const TextStyle(
+                        color: Colors.grey,
                       ),
-                      borderRadius: BorderRadius.circular(7),
+                      floatingLabelStyle: const TextStyle(color: Colors.blue),
                     ),
-                    border: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Colors.blue,
-                      ),
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    suffixIcon: const Icon(
-                      CupertinoIcons.eye,
-                      color: Colors.grey,
-                    ),
-                    labelText: "Password",
-                    labelStyle: const TextStyle(
-                      color: Colors.grey,
-                    ),
-                    floatingLabelStyle: const TextStyle(color: Colors.blue),
                   ),
                 ),
               ],

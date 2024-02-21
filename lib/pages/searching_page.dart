@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/pages/posts_user_profile.dart';
 import 'package:social_app/provider/search_provider.dart';

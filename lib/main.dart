@@ -15,6 +15,7 @@ import 'package:social_app/provider/navigation_provider.dart';
 import 'package:social_app/provider/posts_provider.dart';
 import 'package:social_app/provider/profile_provider.dart';
 import 'package:social_app/provider/search_provider.dart';
+import 'package:social_app/provider/show_password.dart';
 import 'package:social_app/provider/user_provider.dart';
 import 'package:social_app/utils/routes/myroutes.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -40,6 +41,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => ChatProvider()),
         ChangeNotifierProvider(create: (context) => LatestMessageProvider()),
         ChangeNotifierProvider(create: (context) => SearchProvider()),
+        ChangeNotifierProvider(create: (context) => ShowPasswordProvider()),
       ],
       child: const MyApp(),
     ),
