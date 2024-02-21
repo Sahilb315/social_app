@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:social_app/components/post_tile.dart';
+import 'package:social_app/components/bookmark_tile.dart';
 import 'package:social_app/provider/bookmarks_provider.dart';
 import 'package:social_app/provider/posts_provider.dart';
 
@@ -16,8 +16,9 @@ class _BookmarkPageState extends State<BookmarkPage> {
   final user = FirebaseAuth.instance.currentUser;
   @override
   void initState() {
+    Provider.of<BookmarkProvider>(context, listen: false).user =
+        FirebaseAuth.instance.currentUser!;
     Provider.of<BookmarkProvider>(context, listen: false).fetchUsersBookmarks();
-    Provider.of<BookmarkProvider>(context, listen: false).user = FirebaseAuth.instance.currentUser!;
     super.initState();
   }
 
@@ -31,16 +32,13 @@ class _BookmarkPageState extends State<BookmarkPage> {
       body: Column(
         children: [
           Consumer2<BookmarkProvider, PostsProvider>(
-            builder: (context, value, post, child) {
+            builder: (context, bookmarkProvider, post, child) {
               return Expanded(
                 child: ListView.builder(
-                  itemCount: value.bookmarks.length,
+                  itemCount: bookmarkProvider.bookmarks.length,
                   itemBuilder: (context, index) {
-                    return PostTile(
-                      docID:  value.bookmarks[index].id,
-                      index: index,
-                      postModel: post.list[index],
-                      date: post.list[index].timestamp.toString(),
+                    return MyBookmarkListTile(
+                      postModel: bookmarkProvider.bookmarks[index],
                     );
                   },
                 ),

@@ -1,21 +1,19 @@
-import 'dart:developer';
+
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:social_app/components/drawer.dart';
-import 'package:social_app/models/user_model.dart';
+import 'package:social_app/pages/searching_page.dart';
 import 'package:social_app/pages/search_tab_pages/for_you_tab_page.dart';
-import 'package:social_app/provider/search_provider.dart';
 
-class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
+class ExplorePage extends StatefulWidget {
+  const ExplorePage({super.key});
 
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  State<ExplorePage> createState() => _ExplorePageState();
 }
 
-class _SearchPageState extends State<SearchPage>
+class _ExplorePageState extends State<ExplorePage>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
 
@@ -122,80 +120,6 @@ class _SearchPageState extends State<SearchPage>
   }
 }
 
-class SearchingPage extends StatefulWidget {
-  const SearchingPage({super.key});
-
-  @override
-  State<SearchingPage> createState() => _SearchingPageState();
-}
-
-class _SearchingPageState extends State<SearchingPage> {
-  final searchController = TextEditingController();
-  @override
-  void initState() {
-    Provider.of<SearchProvider>(context, listen: false).getAllUsers();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<SearchProvider>(
-      builder: (context, provider, child) => Scaffold(
-        appBar: AppBar(
-          title: TextFormField(
-            autofocus: true,
-            controller: searchController,
-            decoration: const InputDecoration(
-              hintText: "Search X",
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-            ),
-            onChanged: (value) {
-              if (value.isEmpty) {
-                provider.clearList();
-              }
-              for (var i = 0; i < provider.users.length; i++) {
-                if (provider.users[i].name
-                        .toLowerCase()
-                        .contains(value.toLowerCase()) ||
-                    provider.users[i].username
-                        .toLowerCase()
-                        .contains(value.toString())) {
-                  if (provider.searchedUsers.contains(provider.users[i])) {
-                    return;
-                  }
-                  provider.addUser(provider.users[i]);
-                }
-              }
-            },
-          ),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: provider.searchedUsers.length,
-                itemBuilder: (context, index) {
-                  final users = provider.searchedUsers;
-                  if (users.isEmpty) {
-                    return const Text("No users were found");
-                  }
-                  log(index.toString());
-                  final singleUser = provider.searchedUsers[index];
-                  return ListTile(
-                    leading: CircleAvatar(),
-                    title: Text(singleUser.name),
-                    subtitle: Text("data"),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class RecentUsers extends StatelessWidget {
   const RecentUsers({

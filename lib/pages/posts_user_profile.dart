@@ -1,7 +1,11 @@
+// ignore_for_file: dead_code
+
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:social_app/models/posts_model.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/pages/profile_tab_page/posts_tab.dart';
 import 'package:social_app/pages/profile_tab_page/replies_tab.dart';
@@ -9,11 +13,9 @@ import 'package:social_app/provider/profile_provider.dart';
 
 class PostUserProfile extends StatefulWidget {
   final UserModel userModel;
-  final PostModel postModel;
   const PostUserProfile({
     super.key,
     required this.userModel,
-    required this.postModel,
   });
 
   @override
@@ -33,7 +35,7 @@ class _PostUserProfileState extends State<PostUserProfile>
         .fetchRepliesByUser(widget.userModel.email);
     tabController = TabController(length: 2, vsync: this);
     userModel = widget.userModel;
-    postModel = widget.postModel;
+    user = FirebaseAuth.instance.currentUser!;
     super.initState();
   }
 
@@ -46,8 +48,8 @@ class _PostUserProfileState extends State<PostUserProfile>
         .fetchRepliesByUser(widget.userModel.email);
   }
 
+  User? user;
   late UserModel userModel;
-  late PostModel postModel;
 
   @override
   Widget build(BuildContext context) {
@@ -100,183 +102,221 @@ class _PostUserProfileState extends State<PostUserProfile>
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8),
-              child:
-                  // Consumer<ProfileProvider>(
-                  //   builder: (context, value, child) {
-                  //     var profile = value.userModel;
-                  //     return
-                  Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Consumer<ProfileProvider>(
+                builder: (context, value, child) {
+                  log('Rebuilt Consumer');
+                  return Column(
                     children: [
-                      Column(
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            userModel.name,
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                value.userModel.name,
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "@${value.userModel.username}",
+                              ),
+                            ],
                           ),
-                          Text(
-                            "@${userModel.username}",
+                          value.userModel.followers.contains(user!.email)
+                              ? MaterialButton(
+                                  color:
+                                      Theme.of(context).colorScheme.background,
+                                  onPressed: () {
+                                    value.followOrUnfollowUser(
+                                      value.userModel,
+                                      user!.email.toString(),
+                                    );
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    side: const BorderSide(color: Colors.grey),
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: Text(
+                                    "Following",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .inversePrimary,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                )
+                              : MaterialButton(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .inversePrimary,
+                                  onPressed: () {
+                                    value.followOrUnfollowUser(
+                                      value.userModel,
+                                      user!.email.toString(),
+                                    );
+                                    print("Tapped");
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    side: const BorderSide(color: Colors.grey),
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: Text(
+                                    "Follow",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .background,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      //? BIO
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          userModel.bio,
+                          style: const TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      //? FIELD
+                      Row(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.briefcase,
+                            size: 16,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Expanded(
+                            child: Text(
+                              userModel.field,
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      MaterialButton(
-                        color: Colors.blue,
-                        onPressed: () {},
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: const Text(
-                          "Follow +",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  //? BIO
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      userModel.bio,
-                      style: const TextStyle(
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  //? FIELD
-                  Row(
-                    children: [
-                      const Icon(
-                        CupertinoIcons.briefcase,
-                        size: 16,
-                      ),
                       const SizedBox(
-                        width: 5,
+                        height: 10,
                       ),
-                      Expanded(
-                        child: Text(
-                          userModel.field,
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  //? DOB
-                  Row(
-                    children: [
-                      Image.asset(
-                        "assets/balloon.png",
-                        width: 20,
-                        height: 17,
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                      ),
-                      Text(
-                        "Born ${userModel.dob}",
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  //? Joined
-                  Row(
-                    children: [
-                      const Icon(
-                        CupertinoIcons.calendar,
-                        size: 16,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Expanded(
-                        child: Text(
-                          "Joined ${userModel.joined}",
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  //? Following
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
+                      //? DOB
+                      Row(
+                        children: [
+                          Image.asset(
+                            "assets/balloon.png",
+                            width: 20,
+                            height: 17,
                             color: Theme.of(context).colorScheme.inversePrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17,
                           ),
-                          text: userModel.following.toString(),
-                          children: const [
-                            TextSpan(
-                              text: " Following",
+                          Text(
+                            "Born ${userModel.dob}",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      //? Joined
+                      Row(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.calendar,
+                            size: 16,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Expanded(
+                            child: Text(
+                              "Joined ${userModel.joined}",
                               style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.normal,
+                                color: Colors.grey.shade600,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       const SizedBox(
-                        width: 15,
+                        height: 10,
                       ),
-                      //? Followers
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.inversePrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17,
-                          ),
-                          text: userModel.followers.toString(),
-                          children: const [
-                            TextSpan(
-                              text: " Followers",
+                      //? Following
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          RichText(
+                            text: TextSpan(
                               style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.normal,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
                               ),
+                              text: value.userModel.following.length.toString(),
+                              children: const [
+                                TextSpan(
+                                  text: " Following",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          //? Followers
+                          RichText(
+                            text: TextSpan(
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                              ),
+                              text: value.userModel.followers.length.toString(),
+                              children: const [
+                                TextSpan(
+                                  text: " Followers",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
                     ],
-                  )
-                ],
+                  );
+                },
               ),
-              //   },
-              // ),
             ),
             const SizedBox(
               height: 10,

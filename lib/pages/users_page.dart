@@ -74,7 +74,7 @@ class _UsersPageState extends State<UsersPage> {
                   "Seach Direct Messages",
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.background,
+                    color: Theme.of(context).colorScheme.inversePrimary,
                     fontSize: 16,
                   ),
                 ),

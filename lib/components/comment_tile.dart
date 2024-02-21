@@ -65,7 +65,7 @@ class _CommentTileState extends State<CommentTile> {
                           }
                           return PostUserProfile(
                             userModel: userModel,
-                            postModel: widget.postModel,
+                            // postModel: widget.postModel,
                           );
                         },
                         transitionsBuilder:

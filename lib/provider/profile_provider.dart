@@ -10,7 +10,8 @@ class ProfileProvider extends ChangeNotifier {
   List<PostModel> _usersPostList = [];
   List<PostModel> get usersPostList => _usersPostList;
   UserModel _userModel = UserModel(
-    profileUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s",
+    profileUrl:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s",
     dob: "",
     name: "",
     email: "",
@@ -19,10 +20,26 @@ class ProfileProvider extends ChangeNotifier {
     bio: "",
     location: "",
     field: "",
-    followers: 0,
-    following: 0,
+    followers: [],
+    following: [],
   );
   UserModel get userModel => _userModel;
+
+  UserModel _currentUserModel = UserModel(
+    profileUrl:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s",
+    dob: "",
+    name: "",
+    email: "",
+    username: "",
+    joined: "",
+    bio: "",
+    location: "",
+    field: "",
+    followers: [],
+    following: [],
+  );
+  UserModel get currentUserModel => _userModel;
 
   List<CommentModel> _usersReplies = [];
   List<CommentModel> get usersReplies => _usersReplies;
@@ -30,13 +47,74 @@ class ProfileProvider extends ChangeNotifier {
   final postsFirestore = FirebaseFirestore.instance.collection("post");
   final userFirestore = FirebaseFirestore.instance.collection("user");
 
+  Future<void> followOrUnfollowUser(
+      UserModel model, String currentUserEmail) async {
+    if (model.followers.contains(currentUserEmail)) {
+      /// Updating the value locally in the models
+
+      /// Updating the followers of the user whom the current user followed/unfollowed
+      _userModel.followers.remove(currentUserEmail);
+
+      /// Updating the follwoing of the current user whom the current user followed/unfollowed
+      _currentUserModel.following.remove(model.email);
+
+      /// Updating the follwoing of the current user whom the current user followed/unfollowed in firestore
+      await userFirestore.doc(currentUserEmail).update({
+        'following': FieldValue.arrayRemove([model.email]),
+      });
+
+      /// Updating the followers of the user whom the current user followed/unfollowed in firestore
+      await userFirestore.doc(model.email).update({
+        'followers': FieldValue.arrayRemove([currentUserEmail]),
+      });
+    } else {
+      /// Updating the followers of the user whom the current user followed/unfollowed
+      _userModel.followers.add(currentUserEmail);
+
+      /// Updating the follwoing of the current user whom the current user followed/unfollowed
+      _currentUserModel.following.add(model.email);
+
+      /// Updating the following of the current user whom the current user followed/unfollowed in firestore
+      await userFirestore.doc(currentUserEmail).update({
+        'following': FieldValue.arrayUnion([model.email]),
+      });
+      /// Updating the followers of the user whom the current user followed/unfollowed in firestore
+      await userFirestore.doc(model.email).update({
+        'followers': FieldValue.arrayUnion([currentUserEmail]),
+      });
+    }
+    notifyListeners();
+  }
+
+  Future<void> updateCurrentUserFollowing(
+      String currentUserEmail, UserModel model) async {
+    if (_currentUserModel.following.contains(model.email)) {
+      _currentUserModel.following.remove(model.email);
+      await userFirestore.doc(currentUserEmail).update({
+        'following': FieldValue.arrayRemove([model.email]),
+      });
+    } else {
+      log("adding following ${_currentUserModel.following.contains(model.email)}");
+      _currentUserModel.following.add(model.email);
+      await userFirestore.doc(currentUserEmail).update({
+        'following': FieldValue.arrayUnion([model.email]),
+      });
+    }
+  }
+
+  Future<void> getCurrentUsersModel(String currentUserEmail) async {
+    final snap = await userFirestore.doc(currentUserEmail).get();
+    _currentUserModel = UserModel.fromFirestore(snap);
+    notifyListeners();
+  }
+
   Future<void> editUserProfileDetails({
     required String? email,
     required String name,
     required String bio,
     required String location,
     required String field,
-     String? profileUrl,
+    String? profileUrl,
   }) async {
     await userFirestore.doc(email).update({
       'bio': bio,

@@ -9,8 +9,8 @@ class UserModel {
   final String location;
   final String bio;
   final String field;
-  final int followers;
-  final int following;
+  final List followers;
+  final List following;
   final String profileUrl;
 
   UserModel({
@@ -34,8 +34,8 @@ class UserModel {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return UserModel(
       profileUrl: data['profileUrl'],
-      followers: data['followers'] ?? 0,
-      following: data['following'] ?? 0,
+      followers: data['followers'] ?? [],
+      following: data['following'] ?? [],
       location: data['location'] ?? "",
       bio: data['bio'] ?? "",
       field: data['field'] ?? "",

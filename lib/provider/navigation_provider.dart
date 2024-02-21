@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_app/pages/home_page.dart';
-import 'package:social_app/pages/search_page.dart';
+import 'package:social_app/pages/explore_page.dart';
 import 'package:social_app/pages/users_page.dart';
 
 class NavigationProvider extends ChangeNotifier {
@@ -9,7 +9,7 @@ class NavigationProvider extends ChangeNotifier {
 
   final List _pages = [
     const HomePage(),
-    const SearchPage(),
+    const ExplorePage(),
     const UsersPage(),
   ];
   List get pages => _pages;

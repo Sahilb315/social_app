@@ -16,7 +16,15 @@ class _ForYouTabStatePage extends State<ForYouTabPage> {
           children: [
             Container(
               height: MediaQuery.sizeOf(context).height * 0.3,
-              color: Colors.grey,
+              decoration: const BoxDecoration(
+                color: Colors.grey,
+                image: DecorationImage(
+                  image: NetworkImage(
+                    "https://img.olympics.com/images/image/private/t_16-9_760/f_auto/primary/hyx0yrwwlx4ps0icteji",
+                  ),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),

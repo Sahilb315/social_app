@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,11 +23,13 @@ class SearchProvider extends ChangeNotifier {
   }
 
   void addUser(UserModel model) {
+    
     _searchedUsers.add(model);
     notifyListeners();
   }
 
   void clearList() {
+    log('Clear List');
     _searchedUsers.clear();
     notifyListeners();
   }

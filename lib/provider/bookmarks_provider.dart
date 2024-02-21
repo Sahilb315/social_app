@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,10 +13,13 @@ class BookmarkProvider extends ChangeNotifier {
   User? user;
 
   Future<void> fetchUsersBookmarks() async {
+    print(user!.email);
     final snap =
-        await firestore.where('bookmark', arrayContains: "shubh@gmail.com").get();
-    _bookmarks = snap.docs.map((doc) => PostModel.fromFirestore(doc)).toList();
+        await firestore.where('bookmark', arrayContains: user!.email).get();
+    _bookmarks = snap.docs.map((doc) {
+      log(PostModel.fromFirestore(doc).toMap().toString());
+      return PostModel.fromFirestore(doc);
+    }).toList();
     notifyListeners();
   }
 }
- 
