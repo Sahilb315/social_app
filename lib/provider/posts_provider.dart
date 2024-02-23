@@ -13,13 +13,15 @@ enum DataStatus {
 }
 
 class PostsProvider extends ChangeNotifier {
+  bool _dataIsFetched = false;
+  bool get dataIsFetched => _dataIsFetched;
+
+  void setDataFetch(bool value) {
+    _dataIsFetched = value;
+  }
+
   List<PostModel> _postList = [];
   List<PostModel> get list => _postList;
-
-  // set postList(List<PostModel> list) {
-  //   _postList = list;
-  //   notifyListeners();
-  // }
 
   PostModel _postModel = PostModel(
     id: "",
@@ -49,14 +51,14 @@ class PostsProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-  //? This will not work until i pass the model from the list rather then passing the model from the home screen(Like this widget.postModel) bcoz the consumer
-  //? will not update
+  //? This will not work until i pass the model from the list rather then passing the model from the
+  //? home screen(Like this widget.postModel) bcoz the consumer will not update
   // Future<void> updateBookmark(
   //     {required PostModel postModel, int? index}) async {
   //       log("Update Bookmark ${postModel.toMap().toString()}");
   //   log("Bookmark  ${postModel.id}");
-  //   if (postModel.bookmark.contains(user!.email)) {
-  //     // if (_postList[index!].bookmark.contains(user!.email)) {
+  // if (postModel.bookmark.contains(user!.email)) {
+  // //   if (_postList[index!].bookmark.contains(user!.email)) {
   //     log("Removing bookmark");
   //     await firestore.doc(postModel.id).update({
   //       'bookmark': FieldValue.arrayRemove([user!.email]),
@@ -72,17 +74,58 @@ class PostsProvider extends ChangeNotifier {
 
   Future<void> updatePostBookmark(String docID, int index) async {
     if (_postList[index].bookmark.contains(user!.email)) {
-      log("Remove");
+      log("Remove Bookmark");
       _postList[index].bookmark.remove(user!.email);
       await firestore.doc(docID).update({
         'bookmark': FieldValue.arrayRemove([user!.email]),
       });
     } else {
+      log("Add Bookmark");
       _postList[index].bookmark.add(user!.email);
-
-      log("Add");
       await firestore.doc(docID).update({
         'bookmark': FieldValue.arrayUnion([user!.email]),
+      });
+    }
+    notifyListeners();
+  }
+
+  Future<void> updateSinglePostBookmark(String docID) async {
+    // Getting the the Specific Post from the Post List by matching the Post's DocID within the whole list
+    // without using the index
+    final postBookmark =
+        _postList.where((element) => element.id == docID).first.bookmark;
+    if (postBookmark.contains(user!.email)) {
+      log("Open Post Remove Bookmark");
+      postBookmark.remove(user!.email);
+      await firestore.doc(docID).update({
+        'bookmark': FieldValue.arrayRemove([user!.email]),
+      });
+    } else {
+      log("Open Post Add Bookmark");
+      postBookmark.add(user!.email);
+      await firestore.doc(docID).update({
+        'bookmark': FieldValue.arrayUnion([user!.email]),
+      });
+    }
+    notifyListeners();
+  }
+
+  Future<void> updateSinglePostLike(String docID) async {
+    // Getting the the Specific Post from the Post List by matching the Post's DocID within the whole list
+    // without using the index
+    final postLike =
+        _postList.where((element) => element.id == docID).first.like;
+    if (postLike.contains(user!.email)) {
+      log("Open Post Remove Like");
+      postLike.remove(user!.email);
+      await firestore.doc(docID).update({
+        'like': FieldValue.arrayRemove([user!.email]),
+      });
+    } else {
+      log("Open Post Add Like");
+      postLike.add(user!.email);
+      await firestore.doc(docID).update({
+        'like': FieldValue.arrayUnion([user!.email]),
       });
     }
     notifyListeners();
@@ -95,7 +138,6 @@ class PostsProvider extends ChangeNotifier {
 
   Future<void> fetchPosts() async {
     change(DataStatus.fetching);
-    // log(currentStatus.name);
     try {
       final snapshot =
           await firestore.orderBy('timestamp', descending: true).get();
@@ -103,7 +145,6 @@ class PostsProvider extends ChangeNotifier {
         return PostModel.fromFirestore(doc);
       }).toList();
       change(DataStatus.fetched);
-      // log(currentStatus.name);
       notifyListeners();
     } catch (e) {
       change(DataStatus.error);
@@ -124,10 +165,21 @@ class PostsProvider extends ChangeNotifier {
       }).then(
         (value) async {
           await firestore.doc(value.id).update({'id': value.id});
+          _postList.add(
+            PostModel(
+              id: value.id,
+              username: model.username,
+              useremail: model.useremail,
+              postmessage: model.postmessage,
+              like: [],
+              timestamp: model.timestamp,
+              bookmark: [],
+            ),
+          );
         },
       );
+      notifyListeners();
       log("Adding Posts");
-      fetchPosts();
       log("Posts Added");
     } catch (e) {
       log(e.toString());
@@ -138,8 +190,6 @@ class PostsProvider extends ChangeNotifier {
     try {
       final snap = await firestore.doc(docID).get();
       _postModel = PostModel.fromFirestore(snap);
-      // print(_postModel.toMap());
-
       notifyListeners();
     } catch (e) {
       log(e.toString());

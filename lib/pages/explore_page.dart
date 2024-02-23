@@ -1,5 +1,3 @@
-
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/components/drawer.dart';
@@ -86,6 +84,7 @@ class _ExplorePageState extends State<ExplorePage>
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           TabBar(
+            tabAlignment: TabAlignment.start,
             isScrollable: true,
             unselectedLabelColor: Colors.grey,
             labelColor: Colors.white,
@@ -119,7 +118,6 @@ class _ExplorePageState extends State<ExplorePage>
     );
   }
 }
-
 
 class RecentUsers extends StatelessWidget {
   const RecentUsers({

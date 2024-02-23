@@ -23,9 +23,15 @@ class _HomePageState extends State<HomePage> {
   List<PostModel> postList = [];
   late User? user;
 
+  final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
-    Provider.of<PostsProvider>(context, listen: false).fetchPosts();
+    if (Provider.of<PostsProvider>(context, listen: false).dataIsFetched ==
+        false) {
+      Provider.of<PostsProvider>(context, listen: false).fetchPosts();
+      Provider.of<PostsProvider>(context, listen: false).setDataFetch(true);
+    } else {}
     Provider.of<PostsProvider>(context, listen: false).user =
         FirebaseAuth.instance.currentUser;
     user = FirebaseAuth.instance.currentUser!;
@@ -40,11 +46,12 @@ class _HomePageState extends State<HomePage> {
     Provider.of<PostsProvider>(context, listen: false).fetchPosts();
   }
 
-  final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+  final commentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawerEnableOpenDragGesture: false,
       key: _scaffoldState,
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
@@ -59,7 +66,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        // toolbarHeight: MediaQuery.sizeOf(context).height * 0.06,
         title: const Text("P O S T S"),
         centerTitle: true,
         foregroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -77,9 +83,10 @@ class _HomePageState extends State<HomePage> {
               onRefresh: refresh,
               child: Stack(
                 children: [
-                  Consumer<PostsProvider>(
-                    builder: (context, value, child) {
-                      final postList = value.list;
+                  Consumer2<PostsProvider, CommentsProvider>(
+                    builder: (context, postProvider, commentProvider, child) {
+                      log("Home Page Consumer");
+                      final postList = postProvider.list;
                       return Center(
                         child: ListView.builder(
                           itemCount: postList.length,
@@ -90,6 +97,26 @@ class _HomePageState extends State<HomePage> {
                               index: index,
                               postModel: postModel,
                               date: postModel.timestamp.toString(),
+                              onBookmarkPressed: () {
+                                postProvider.updatePostBookmark(
+                                  postModel.id,
+                                  index,
+                                );
+                              },
+                              onCommentPressed: () {
+                                commentProvider.addCommentSheet(
+                                  context,
+                                  commentController,
+                                  postModel.id,
+                                  postModel.username,
+                                );
+                              },
+                              onLikePressed: () {
+                                postProvider.updatePostLike(
+                                  postModel.id,
+                                  index,
+                                );
+                              },
                             );
                           },
                         ),
@@ -103,9 +130,13 @@ class _HomePageState extends State<HomePage> {
                       foregroundColor: Colors.white,
                       backgroundColor: Colors.blue,
                       shape: const StadiumBorder(),
-                      onPressed: () =>
-                          Provider.of<PostsProvider>(context, listen: false)
-                              .addPostsSheet(context, postController),
+                      onPressed: () => Provider.of<PostsProvider>(
+                        context,
+                        listen: false,
+                      ).addPostsSheet(
+                        context,
+                        postController,
+                      ),
                       child: const Icon(Icons.add),
                     ),
                   ),

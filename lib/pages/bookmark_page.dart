@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/components/bookmark_tile.dart';
+import 'package:social_app/pages/post_open_page.dart';
 import 'package:social_app/provider/bookmarks_provider.dart';
 import 'package:social_app/provider/posts_provider.dart';
 
@@ -37,8 +38,23 @@ class _BookmarkPageState extends State<BookmarkPage> {
                 child: ListView.builder(
                   itemCount: bookmarkProvider.bookmarks.length,
                   itemBuilder: (context, index) {
-                    return MyBookmarkListTile(
-                      postModel: bookmarkProvider.bookmarks[index],
+                    return GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  PostOpenPage(
+                            username: bookmarkProvider.bookmarks[index].username,
+                            docID: bookmarkProvider.bookmarks[index].id,
+                            postModel: bookmarkProvider.bookmarks[index],
+                            // profileUrl: profileUrl,
+                          ),
+                        ),
+                      ),
+                      child: MyBookmarkListTile(
+                        postModel: bookmarkProvider.bookmarks[index],
+                      ),
                     );
                   },
                 ),

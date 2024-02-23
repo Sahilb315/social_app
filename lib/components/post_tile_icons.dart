@@ -22,6 +22,8 @@ class IconsContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
           onTap: onPressed,
@@ -37,6 +39,7 @@ class IconsContainer extends StatelessWidget {
                   size: 22,
                 ),
         ),
+        const SizedBox(width: 3),
         Text(
           text ?? "",
           style: TextStyle(color: Theme.of(context).colorScheme.inversePrimary),
