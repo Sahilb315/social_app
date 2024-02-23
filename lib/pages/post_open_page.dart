@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,21 +10,24 @@ import 'package:social_app/components/post_tile_icons.dart';
 import 'package:social_app/helper/format_date.dart';
 import 'package:social_app/helper/hashtag.dart';
 import 'package:social_app/models/posts_model.dart';
+import 'package:social_app/models/user_model.dart';
+import 'package:social_app/pages/posts_user_profile.dart';
+import 'package:social_app/pages/profile_page.dart';
 import 'package:social_app/provider/comments_povider.dart';
 import 'package:social_app/provider/posts_provider.dart';
 
 class PostOpenPage extends StatefulWidget {
   final String docID;
   final PostModel postModel;
-  final int index;
-  final String profileUrl;
+  // final String profileUrl;
+  final String username;
 
   const PostOpenPage({
     super.key,
+    required this.username,
     required this.docID,
     required this.postModel,
-    required this.index,
-    required this.profileUrl,
+    // required this.profileUrl,
   });
 
   @override
@@ -34,6 +38,14 @@ class PostOpenPageState extends State<PostOpenPage> {
   User? user = FirebaseAuth.instance.currentUser;
   final commentController = TextEditingController();
 
+  Future<DocumentSnapshot> getProfile() async {
+    final userCollection = FirebaseFirestore.instance.collection("user");
+    final doc = await userCollection.doc(widget.postModel.useremail).get();
+    return doc;
+  }
+
+  String? profileUrl;
+  String? username;
   @override
   void initState() {
     Provider.of<PostsProvider>(context, listen: false)
@@ -56,6 +68,8 @@ class PostOpenPageState extends State<PostOpenPage> {
       ),
       body: Consumer2<PostsProvider, CommentsProvider>(
         builder: (context, post, comment, child) {
+          final singlePostModel =
+              post.list.where((element) => element.id == widget.docID).first;
           log("In Open Page consumer");
           return Padding(
             padding: const EdgeInsets.all(14.0),
@@ -67,11 +81,64 @@ class PostOpenPageState extends State<PostOpenPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: CircleAvatar(
-                            foregroundImage: NetworkImage(widget.profileUrl),
-                          ),
+                        FutureBuilder(
+                          future: getProfile(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              UserModel userModel =
+                                  UserModel.fromFirestore(snapshot.data!);
+
+                              final doc =
+                                  snapshot.data!.data() as Map<String, dynamic>;
+                              String data = doc["profileUrl"];
+                              username = doc['username'];
+                              profileUrl = data;
+                              return GestureDetector(
+                                onTap: () => Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
+                                      if (FirebaseAuth
+                                              .instance.currentUser!.email ==
+                                          widget.postModel.useremail) {
+                                        return const ProfilePage();
+                                      }
+                                      return PostUserProfile(
+                                        userModel: userModel,
+                                        // postModel: widget.postModel,
+                                      );
+                                    },
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      var begin = const Offset(1.0, 0.0);
+                                      var end = Offset.zero;
+                                      var curve = Curves.easeIn;
+
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+                                      return SlideTransition(
+                                        position: animation.drive(tween),
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: CircleAvatar(
+                                    foregroundImage: NetworkImage(data),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return const CircleAvatar(
+                                foregroundImage: NetworkImage(
+                                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV5lof4YCEqxL3U1KVac7UgbdG6SG8bfs0hWoVkqJ2w4GIeujd_ps78_loMw&s",
+                                ),
+                              );
+                            }
+                          },
                         ),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -80,7 +147,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                             Row(
                               children: [
                                 Text(
-                                  post.post.username,
+                                  widget.postModel.username,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20,
@@ -88,9 +155,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                                 ),
                               ],
                             ),
-                            Text(
-                              post.post.useremail,
-                            ),
+                            Text("@${widget.username}"),
                           ],
                         ),
                       ],
@@ -103,7 +168,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         HashtagView(
-                          text: post.post.postmessage,
+                          text: widget.postModel.postmessage,
                           maxLines: null,
                           textOverflow: TextOverflow.visible,
                           textSize: 20,
@@ -116,7 +181,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              formatDate(post.post.timestamp),
+                              formatDate(widget.postModel.timestamp),
                               style: const TextStyle(fontSize: 16),
                             ),
                           ],
@@ -133,18 +198,15 @@ class PostOpenPageState extends State<PostOpenPage> {
                               //* Issue with using the model from the home screen is that it will not update the bookmarks
                               //? Bookmark
                               IconsContainer(
-                                value: post.list[widget.index].bookmark
+                                value: singlePostModel.bookmark
                                     .contains(user!.email),
-                                text: post.list[widget.index].bookmark.length
-                                    .toString(),
+                                text:
+                                    singlePostModel.bookmark.length.toString(),
                                 iconFalse: CupertinoIcons.bookmark,
                                 iconTrue: CupertinoIcons.bookmark_fill,
                                 colorTrue: Colors.blue,
                                 onPressed: () {
-                                  post.updatePostBookmark(
-                                    widget.postModel.id,
-                                    widget.index,
-                                  );
+                                  post.updateSinglePostBookmark(widget.docID);
                                 },
                               ),
                               const SizedBox(
@@ -176,7 +238,7 @@ class PostOpenPageState extends State<PostOpenPage> {
                                     context,
                                     commentController,
                                     widget.docID,
-                                    post.list[widget.index].username,
+                                    widget.postModel.username,
                                   );
                                 },
                               ),
@@ -185,45 +247,16 @@ class PostOpenPageState extends State<PostOpenPage> {
                               ),
                               //? Like
                               IconsContainer(
-                                value: post.list[widget.index].like
-                                    .contains(user!.email),
-                                text: post.list[widget.index].like.length
-                                    .toString(),
+                                value:
+                                    singlePostModel.like.contains(user!.email),
+                                text: singlePostModel.like.length.toString(),
                                 iconFalse: CupertinoIcons.heart,
                                 iconTrue: CupertinoIcons.heart_fill,
                                 colorTrue: Colors.red,
                                 onPressed: () {
-                                  post.updatePostLike(
-                                    widget.docID,
-                                    widget.index,
-                                  );
+                                  post.updateSinglePostLike(widget.docID);
                                 },
                               ),
-                              // IconButton(
-                              //   onPressed: () {
-                              //     post.updatePostLike(
-                              //       widget.docID,
-                              //       widget.index,
-                              //     );
-                              //   },
-                              //   icon: post.list[widget.index].like
-                              //           .contains(user!.email)
-                              //       // true
-                              //       ? const Icon(
-                              //           CupertinoIcons.heart_fill,
-                              //           color: Colors.red,
-                              //         )
-                              //       : Icon(
-                              //           CupertinoIcons.heart,
-                              //           color: Theme.of(context)
-                              //               .colorScheme
-                              //               .inversePrimary,
-                              //         ),
-                              // ),
-                              // Text(
-                              //   post.list[widget.index].like.length.toString(),
-                              //   style: const TextStyle(fontSize: 16),
-                              // ),
                             ],
                           ),
                         ),

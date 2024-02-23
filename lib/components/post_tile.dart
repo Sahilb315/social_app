@@ -1,9 +1,7 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:social_app/components/post_tile_icons.dart';
 import 'package:social_app/helper/hashtag.dart';
 import 'package:social_app/helper/timeago_messages.dart';
@@ -12,8 +10,6 @@ import 'package:social_app/models/user_model.dart';
 import 'package:social_app/pages/post_open_page.dart';
 import 'package:social_app/pages/posts_user_profile.dart';
 import 'package:social_app/pages/profile_page.dart';
-import 'package:social_app/provider/comments_povider.dart';
-import 'package:social_app/provider/posts_provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class PostTile extends StatefulWidget {
@@ -21,11 +17,17 @@ class PostTile extends StatefulWidget {
   final int index;
   final PostModel postModel;
   final String date;
+  final void Function()? onCommentPressed;
+  final void Function()? onLikePressed;
+  final void Function()? onBookmarkPressed;
 
   const PostTile({
     super.key,
     required this.docID,
     required this.index,
+    required this.onBookmarkPressed,
+    required this.onLikePressed,
+    required this.onCommentPressed,
     required this.postModel,
     required this.date,
   });
@@ -53,6 +55,7 @@ class _PostTileState extends State<PostTile> {
   }
 
   String? profileUrl;
+  String? username;
 
   @override
   Widget build(BuildContext context) {
@@ -63,10 +66,11 @@ class _PostTileState extends State<PostTile> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 PostOpenPage(
+              username: username.toString(),
               docID: widget.docID,
               postModel: widget.postModel,
-              index: widget.index,
-              profileUrl: profileUrl!,
+              // index: widget.index,
+              // profileUrl: profileUrl!,
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -106,6 +110,7 @@ class _PostTileState extends State<PostTile> {
                         final doc =
                             snapshot.data!.data() as Map<String, dynamic>;
                         String data = doc["profileUrl"];
+                        username = doc['username'];
                         profileUrl = data;
                         return GestureDetector(
                           onTap: () => Navigator.push(
@@ -199,87 +204,57 @@ class _PostTileState extends State<PostTile> {
                           textOverflow: TextOverflow.ellipsis,
                           textSize: 16,
                         ),
-                        Consumer2<PostsProvider, CommentsProvider>(
-                          builder:
-                              (context, postProvider, commentProvider, child) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: SizedBox(
-                                height: 25,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    //?   BOOKMARK
-                                    IconsContainer(
-                                      value: postProvider
-                                          .list[widget.index].bookmark
-                                          .contains(user!.email),
-                                      text: postProvider
-                                          .list[widget.index].bookmark.length
-                                          .toString(),
-                                      iconFalse: CupertinoIcons.bookmark,
-                                      iconTrue: CupertinoIcons.bookmark_fill,
-                                      colorTrue: Colors.blue,
-                                      onPressed: () {
-                                        postProvider.updatePostBookmark(
-                                          widget.postModel.id,
-                                          widget.index,
-                                        );
-                                      },
-                                    ),
-                                    //?   RETWEET
-                                    IconsContainer(
-                                      value: false,
-                                      iconFalse: CupertinoIcons.repeat,
-                                      iconTrue: CupertinoIcons.repeat,
-                                      onPressed: () {},
-                                      colorTrue: Colors.green,
-                                    ),
-                                    //?   COMMENT
-                                    IconsContainer(
-                                      value: true,
-                                      iconFalse: CupertinoIcons.bubble_left,
-                                      iconTrue: CupertinoIcons.bubble_left,
-                                      colorTrue: Theme.of(context)
-                                          .colorScheme
-                                          .inversePrimary,
-                                      onPressed: () {
-                                        commentProvider.addCommentSheet(
-                                          context,
-                                          commentController,
-                                          widget.docID,
-                                          postProvider
-                                              .list[widget.index].username,
-                                        );
-                                      },
-                                    ),
-                                    //?   LIKE
-                                    IconsContainer(
-                                      value: postProvider
-                                          .list[widget.index].like
-                                          .contains(user!.email),
-                                      text: postProvider
-                                          .list[widget.index].like.length
-                                          .toString(),
-                                      iconFalse: CupertinoIcons.heart,
-                                      iconTrue: CupertinoIcons.heart_fill,
-                                      colorTrue: Colors.red,
-                                      onPressed: () {
-                                        postProvider.updatePostLike(
-                                          widget.docID,
-                                          widget.index,
-                                        );
-                                      },
-                                    ),
-                                    // To arrange the icons
-                                    const SizedBox()
-                                  ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: SizedBox(
+                            height: 25,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                //?   BOOKMARK
+                                IconsContainer(
+                                  value: widget.postModel.bookmark
+                                      .contains(user!.email),
+                                  text: widget.postModel.bookmark.length
+                                      .toString(),
+                                  iconFalse: CupertinoIcons.bookmark,
+                                  iconTrue: CupertinoIcons.bookmark_fill,
+                                  colorTrue: Colors.blue,
+                                  onPressed: widget.onBookmarkPressed,
                                 ),
-                              ),
-                            );
-                          },
+                                //?   RETWEET
+                                IconsContainer(
+                                  value: false,
+                                  iconFalse: CupertinoIcons.repeat,
+                                  iconTrue: CupertinoIcons.repeat,
+                                  onPressed: () {},
+                                  colorTrue: Colors.green,
+                                ),
+                                //?   COMMENT
+                                IconsContainer(
+                                  value: true,
+                                  iconFalse: CupertinoIcons.bubble_left,
+                                  iconTrue: CupertinoIcons.bubble_left,
+                                  colorTrue: Theme.of(context)
+                                      .colorScheme
+                                      .inversePrimary,
+                                  onPressed: widget.onCommentPressed,
+                                ),
+                                //?   LIKE
+                                IconsContainer(
+                                  value: widget.postModel.like
+                                      .contains(user!.email),
+                                  text: widget.postModel.like.length.toString(),
+                                  iconFalse: CupertinoIcons.heart,
+                                  iconTrue: CupertinoIcons.heart_fill,
+                                  colorTrue: Colors.red,
+                                  onPressed: widget.onLikePressed,
+                                ),
+                                // To arrange the icons
+                                const SizedBox()
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),

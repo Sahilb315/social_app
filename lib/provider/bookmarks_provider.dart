@@ -13,7 +13,6 @@ class BookmarkProvider extends ChangeNotifier {
   User? user;
 
   Future<void> fetchUsersBookmarks() async {
-    print(user!.email);
     final snap =
         await firestore.where('bookmark', arrayContains: user!.email).get();
     _bookmarks = snap.docs.map((doc) {

@@ -11,9 +11,7 @@ class CommentsProvider extends ChangeNotifier {
   final firestore = FirebaseFirestore.instance.collection("post");
   User? user;
 
-  Future<void> fetchComments(
-    String docID,
-  ) async {
+  Future<void> fetchComments(String docID) async {
     try {
       List<CommentModel> model = [];
       final snap = await firestore.doc(docID).collection('comments').get();
@@ -25,7 +23,7 @@ class CommentsProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addComments(CommentModel model, String docID) async {
+  Future<void> _addComments(CommentModel model, String docID) async {
     await firestore.doc(docID).collection('comments').add({
       "commentedBy": model.commentedBy,
       "commentedEmail": model.commentedEmail,
@@ -68,7 +66,7 @@ class CommentsProvider extends ChangeNotifier {
                     ElevatedButton(
                       onPressed: () {
                         if (commentController.text.isNotEmpty) {
-                          addComments(
+                          _addComments(
                             CommentModel(
                               commentedBy: user!.displayName.toString(),
                               commentedEmail: user!.email.toString(),
