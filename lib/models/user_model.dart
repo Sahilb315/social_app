@@ -28,6 +28,11 @@ class UserModel {
   });
 
   @override
+  String toString() {
+    return 'UserModel{dob: $dob, email: $email, name: $name, username: $username, joined: $joined, location: $location, bio: $bio, field: $field, followers: $followers, following: $following, profileUrl: $profileUrl}';
+  }
+
+  @override
   bool operator ==(covariant UserModel other) => name == other.name && username == other.username;
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {

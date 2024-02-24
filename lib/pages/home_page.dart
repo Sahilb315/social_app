@@ -42,7 +42,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> refresh() async {
-    user = FirebaseAuth.instance.currentUser!;
     Provider.of<PostsProvider>(context, listen: false).fetchPosts();
   }
 
@@ -51,7 +50,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawerEnableOpenDragGesture: false,
+      drawerEnableOpenDragGesture: true,
       key: _scaffoldState,
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(

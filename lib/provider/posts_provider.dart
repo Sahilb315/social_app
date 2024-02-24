@@ -132,22 +132,22 @@ class PostsProvider extends ChangeNotifier {
   }
 
   var currentStatus = DataStatus.initial;
-  void change(DataStatus status) {
+  void changeDataStatus(DataStatus status) {
     currentStatus = status;
   }
 
   Future<void> fetchPosts() async {
-    change(DataStatus.fetching);
+    changeDataStatus(DataStatus.fetching);
     try {
       final snapshot =
           await firestore.orderBy('timestamp', descending: true).get();
       _postList = snapshot.docs.map((doc) {
         return PostModel.fromFirestore(doc);
       }).toList();
-      change(DataStatus.fetched);
+      changeDataStatus(DataStatus.fetched);
       notifyListeners();
     } catch (e) {
-      change(DataStatus.error);
+      changeDataStatus(DataStatus.error);
       log(e.toString());
     }
   }
