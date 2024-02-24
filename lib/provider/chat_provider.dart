@@ -6,25 +6,31 @@ class ChatProvider extends ChangeNotifier {
   List<MessageModel> _messagesList = [];
   List<MessageModel> get messagesList => _messagesList;
 
+  final chatroomFirebase = FirebaseFirestore.instance.collection('chatroom');
+
   Future<void> addMessage(MessageModel model) async {
     List ids = [model.senderEmail, model.receiverEmail];
     ids.sort();
     String chatroomID = ids.join('_');
-    FirebaseFirestore.instance
-        .collection('chatroom')
-        .doc(chatroomID)
-        .collection('messages')
-        .add({
+
+    await chatroomFirebase.doc(chatroomID).set({});
+
+    chatroomFirebase.doc(chatroomID).collection('messages').add({
       'message': model.message,
       'senderEmail': model.senderEmail,
       'receiverEmail': model.receiverEmail,
       'messageSent': model.messageSent,
     });
-    getMessages(receiverEmail: model.receiverEmail, senderEmail: model.senderEmail);
+    getMessages(
+      receiverEmail: model.receiverEmail,
+      senderEmail: model.senderEmail,
+    );
   }
 
-  Future<void> getMessages(
-      {required String receiverEmail, required String senderEmail}) async {
+  Future<void> getMessages({
+    required String receiverEmail,
+    required String senderEmail,
+  }) async {
     List ids = [senderEmail, receiverEmail];
     ids.sort();
     String chatroomID = ids.join('_');
