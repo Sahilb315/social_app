@@ -160,7 +160,6 @@ class _PostUserProfileState extends State<PostUserProfile>
                                       value.userModel,
                                       user!.email.toString(),
                                     );
-                                    print("Tapped");
                                   },
                                   shape: RoundedRectangleBorder(
                                     side: const BorderSide(color: Colors.grey),

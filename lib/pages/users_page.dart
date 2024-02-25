@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,13 +20,11 @@ class _UsersPageState extends State<UsersPage> {
   @override
   void initState() {
     Provider.of<UserProvider>(context, listen: false).getChattedUsers();
-
+    Provider.of<UserProvider>(context, listen: false).getAllNonChattedUsers();
     Future.delayed(
-      const Duration(seconds: 2),
+      const Duration(seconds: 3),
       () {
         if (!mounted) return;
-        Provider.of<UserProvider>(context, listen: false)
-            .getAllNonChattedUsers();
 
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         final latestMessageProvider =
@@ -55,6 +55,8 @@ class _UsersPageState extends State<UsersPage> {
       },
     );
   }
+  //22 top
+  //
 
   final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
@@ -65,24 +67,24 @@ class _UsersPageState extends State<UsersPage> {
       drawer: const MyDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  const NonChattedUsersPage(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                var begin = const Offset(1.0, 0.0);
-                var end = Offset.zero;
-                var curve = Curves.ease;
-                final tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
-                return SlideTransition(
-                  position: animation.drive(tween),
-                  child: child,
-                );
-              },
-            ),
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const NonChattedUsersPage(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              var begin = const Offset(1.0, 0.0);
+              var end = Offset.zero;
+              var curve = Curves.ease;
+              final tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
           ),
+        ),
         shape: const CircleBorder(),
         backgroundColor: Colors.blue,
         child: SizedBox(
@@ -146,8 +148,8 @@ class _UsersPageState extends State<UsersPage> {
           children: [
             Expanded(
               child: Consumer<UserProvider>(
-                builder: (context, value, child) {
-                  final userList = value.chattedUserList;
+                builder: (context, userProvider, child) {
+                  final userList = userProvider.chattedUserList;
                   return ListView.builder(
                     itemCount: userList.length,
                     itemBuilder: (context, index) {
@@ -189,11 +191,12 @@ class _UsersPageState extends State<UsersPage> {
                             ),
                           ),
                           subtitle: Consumer<LatestMessageProvider>(
-                            builder: (context, value, child) {
-                              final message = value.latestMessage;
+                            builder: (context, messageProvider, child) {
+                              final message = messageProvider.latestMessage;
+                              log(message.toString());
                               return Text(
-                                message[index]?.isNotEmpty ?? false
-                                    ? message[index].toString()
+                                message[userProvider.chattedUserList[index].email]?.isNotEmpty ?? false
+                                    ? message[userProvider.chattedUserList[index].email].toString()
                                     : "",
                                 style: TextStyle(
                                   color:
