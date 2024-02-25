@@ -84,14 +84,14 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Map<int, String>> getLatestMessage() async {
+  Future<Map<String, String>> getLatestMessage() async {
     String firstID = FirebaseAuth.instance.currentUser!.email.toString();
     List allIDs = [];
     for (var item in _usersList) {
       allIDs.add(item);
     }
-    //
-    Map<int, String> messages = {};
+
+    Map<String, String> messages = {};
     for (int i = 0; i < allIDs.length; i++) {
       String secondID = allIDs[i].email.toString();
       List ids = [firstID, secondID];
@@ -105,9 +105,10 @@ class UserProvider extends ChangeNotifier {
           .limit(1)
           .get();
       if (data.docs.isNotEmpty) {
-        messages.addAll({i: data.docs.first.data()['message']});
+        messages.addAll({data.docs.first.data()['receiverEmail']: data.docs.first.data()['message']});
       }
     }
+    print(messages);
     return messages;
   }
 }
