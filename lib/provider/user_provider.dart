@@ -22,7 +22,8 @@ class UserProvider extends ChangeNotifier {
         .where('email', isNotEqualTo: FirebaseAuth.instance.currentUser!.email)
         .get();
 
-    /// Users with whom the current user has not chatted
+    /// [Users with whom the current user has not chatted]
+    
     // List<UserModel> allUsersList =
     //     data.docs.map((user) => UserModel.fromFirestore(user)).toList();
     // for (var element in allUsersList) {
@@ -38,6 +39,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> getChattedUsers() async {
+    _chattedUserList.clear();
     final chatroom = await chatroomFirebase.get();
 
     List<String> docsID = [];
@@ -105,10 +107,12 @@ class UserProvider extends ChangeNotifier {
           .limit(1)
           .get();
       if (data.docs.isNotEmpty) {
-        messages.addAll({data.docs.first.data()['receiverEmail']: data.docs.first.data()['message']});
+        messages.addAll({
+          data.docs.first.data()['receiverEmail']:
+              data.docs.first.data()['message']
+        });
       }
     }
-    print(messages);
     return messages;
   }
 }

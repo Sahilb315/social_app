@@ -143,8 +143,8 @@ class _PostTileState extends State<PostTile> {
                             ),
                           ),
                           child: CircleAvatar(
-                            foregroundImage: NetworkImage(data),
-                          ),
+                              foregroundImage: NetworkImage(data),
+                              ),
                         );
                       } else {
                         return const CircleAvatar(
