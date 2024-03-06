@@ -21,7 +21,6 @@ import 'package:social_app/utils/routes/myroutes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -51,9 +50,14 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
+    /// If we dont use the builder below then we will get an exception of [ProviderNotFoundException]
+    /// The error might happen becoz we used a [BuildContext] that does not include the provider of our choice
+    /// The context is associated to the widget that is the parent of Provider<Your_Provider>
+    /// Now this Builder will obtain a new BuildContext that has access to the provider's
+    /// Because we need a [BuildContext] that is ancestor of the provider you are trying to read
     return Builder(
-      builder: (context) {
+      builder: (ctx) {
         return MaterialApp(
           home: const AuthPage(),
           theme: Provider.of<ThemeProvider>(context).themeData,
